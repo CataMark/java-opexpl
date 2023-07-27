@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type="text/css">
+        #fdlg .ui-panelgrid tbody td{
+            white-space: pre-line;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:panelGrid id='panel'>
+        <f:facet name="header">
+            <p:row>
+                <p:column>
+                    <h:outputText value="uid"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="data_set"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="coarea"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="hier"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="descr"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="cost_centre"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="cheie"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="opex_categ"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="ic_part"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        <p:row>
+            <p:column>
+                <!-- uid -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to30chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- data_set -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{precs.dataset.id}" style="font-weight: bold;"/>
+            </p:column>
+            <p:column>
+                <!-- coarea -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{precs.coarea.cod}" style="font-weight: bold;"/>
+            </p:column>
+            <p:column>
+                <!-- hier -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{precs.coarea.hier}" style="font-weight: bold;"/>
+            </p:column>
+            <p:column>
+                <!-- descr -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to2000chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- cost_centre -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to10chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- cheie -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.8digit']}"/>
+            </p:column>
+            <p:column>
+                <!-- opex_categ -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.5digit']}"/>
+            </p:column>
+            <p:column>
+                <!-- ic_part -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to5digit']}"/>
+            </p:column>
+        </p:row>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

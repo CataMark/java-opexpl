@@ -1,0 +1,19 @@
+FROM anydf.azurecr.io/c12153/glassfish:4.1-web-with_mssql_jdbc_and_appskey
+ARG domain=/usr/local/glassfish4/glassfish/domains/domain1
+ENV PATH=$PATH:/usr/local/glassfish4/glassfish/bin
+# replace file domain.xml
+RUN rm $domain/config/domain.xml
+COPY domainANY.xml $domain/config/domain.xml
+# replace file admin-keyfile
+RUN rm $domain/config/admin-keyfile
+COPY admin-keyfile $domain/config/
+# replace file domain-passwords
+RUN rm $domain/config/domain-passwords
+COPY domain-passwords $domain/config/
+# copy distr to server
+RUN mkdir $domain/applications/opexpl-5.0
+COPY target/opexpl-5.0 $domain/applications/opexpl-5.0
+# set envar for communication between instances
+ENV CHILD_APP true
+# server start
+CMD asadmin start-domain --verbose

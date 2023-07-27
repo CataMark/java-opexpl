@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['raps.cdriver.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['raps.cdriver.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <c:if test="#{not empty cdrapprompt.initError}">
+            <p:staticMessage severity="warn" detail="#{cdrapprompt.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty cdrapprompt.initError}">
+            <style type="text/css">
+                #prompt{
+                    display: inline-block;
+                }
+                
+                #prompt\:panel .ui-widget-content{
+                    border-bottom: none;
+                }
+                
+                #prompt\:panel .ui-widget-content:not(:first-child){
+                    border-top: none;
+                }
+                
+                #prompt\:panel .ui-panelgrid-cell{
+                    border: none;
+                }
+            </style>
+
+            <h:form id="prompt">
+                <p:panelGrid id="panel">
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:messages closable="true"/>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.dset']}" for="dataset"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="dataset" value="#{cdrapprompt.set_sel}" tabindex="0" filter="true" filterMatchMode="contains"
+                                             validatorMessage="#{uimess['col.dset']}: #{uimess['mess.required']}">                                
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{cdrapprompt.seturi}" var="item"
+                                               itemLabel="#{item.id} #{item.nume} - #{item.vers} #{item.an}" itemValue="#{item.id}"/>
+                                <f:validateRequired/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.coarea']}" for="coarea"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="coarea" value="#{cdrapprompt.arie_sel}" tabindex="1" filter="true" filterMatchMode="contains"
+                                             validatorMessage="#{uimess['col.coarea']}: #{uimess['mess.required']}">
+                                <p:ajax event="change" listener="#{cdrapprompt.onCoareaChange()}" update="cdriver,ocateg" onstart="disable();" oncomplete="enable();"/>
+                                
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{cdrapprompt.arii}" var="item" itemLabel="#{item.cod} #{item.nume}" itemValue="#{item.cod}"/>
+                                <f:validateRequired/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.cdriver']}" for="cdriver"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="cdriver" value="#{cdrapprompt.cdriver_sel}" tabindex="2" filter="true" filterMatchMode="contains"
+                                             validatorMessage="#{uimess['col.cdriver']}: #{uimess['mess.required']}">
+                                <p:ajax event="change" listener="#{cdrapprompt.onCdriverChange()}" update="ocateg" onstart="disable();" oncomplete="enable();"/>
+                                
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{cdrapprompt.cdrivers}" var="item" itemLabel="#{item.cod} #{item.nume}" itemValue="#{item.cod}"/>
+                                <f:validateRequired/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.categ']}" for="ocateg"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="ocateg" value="#{cdrapprompt.ocateg_sel}" tabindex="3" filter="true" filterMatchMode="contains">                                
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{cdrapprompt.ocategs}" var="item" itemLabel="#{item.nume}" itemValue="#{item.cod}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    
+                    <f:facet name="footer">
+                        <p:row>
+                            <p:column colspan="2" style="text-align: left;">
+                                <p:commandButton ajax="false" id="submit-sumar" widgetVar="submit-sumar" value="#{uimess['plan.sumar']}" icon="fa fa-chevron-right" action="#{cdrapprompt.navigate('sumar')}" tabindex="4"/>
+                                <p:commandButton ajax="false" id="submit-pozitii" widgetVar="submit-pozitii" value="#{uimess['plan.pozitii']}" icon="fa fa-chevron-right" action="#{cdrapprompt.navigate('pozitii')}" tabindex="5"/>
+                                <p:commandButton ajax="false" id="submit-compar" widgetVar="submit-compar" value="#{uimess['plan.comparatie']}" icon="fa fa-chevron-right" action="#{cdrapprompt.navigate('compar')}" tabindex="6"/>
+                                <p:commandButton ajax="false" id="submit-alocare" widgetVar="submit-alocare" value="#{uimess['plan.alocare']}" icon="fa fa-chevron-right" action="#{cdrapprompt.navigate('alocare')}" tabindex="7"/>
+                                <p:defaultCommand target="submit-sumar"/>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                </p:panelGrid>                
+            </h:form>
+        
+            <script>
+                /* <![CDATA[ */            
+                function disable(){
+                    PF('submit-sumar').disable();
+                    PF('submit-pozitii').disable();
+                    PF('submit-compar').disable();
+                    PF('submit-alocare').disable();
+                    jQuery('#progress-bar').show();
+                }
+
+                function enable(){
+                    PF('submit-sumar').enable();
+                    PF('submit-pozitii').enable();
+                    PF('submit-compar').enable();
+                    PF('submit-alocare').enable();
+                    jQuery('#progress-bar').fadeOut(800);
+                }
+
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                    PF('growl').renderMessage({"summary":"#{uimess['plan.cdriver.prompt.growl.title']}",
+                                            "detail":"#{uimess['raps.cdriver.prompt.growl.detail']}",
+                                            "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <h:form id='lang-menu' style="margin: 0;">
+        <p:selectOneMenu id="select" value="#{portal_lang.language}">
+            <f:selectItem itemLabel="RO" itemValue="ro"/>
+            <f:selectItem itemLabel="EN" itemValue="en"/>
+            <p:ajax event="change" oncomplete="window.location.replace(window.location.href);"/>
+        </p:selectOneMenu>
+        <p:remoteCommand id="error" action="#{portal_lang.renderInitMessage()}" autoRun="true"
+                         ignoreAutoUpdate="true" partialSubmit="true" process="@this"/>
+    </h:form>
+</ui:composition>

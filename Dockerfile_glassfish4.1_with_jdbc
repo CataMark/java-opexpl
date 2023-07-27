@@ -1,0 +1,6 @@
+FROM mcr.microsoft.com/java/jre-headless:8u212-zulu-alpine-with-tools
+ENV PATH=$PATH:/usr/local/glassfish4/glassfish/bin
+COPY glassfish4_web /usr/local/glassfish4
+EXPOSE 8080
+WORKDIR /usr/local/glassfish4/glassfish/bin
+CMD asadmin start-domain

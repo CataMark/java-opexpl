@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type="text/css">
+        #fdlg\:panel p{
+            margin-bottom: 0;
+        }
+        #fdlg\:panel ul{
+            margin: 0;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:panel id="panel">
+        <p>Sortare după coloane multiple:</p>
+        <ul>
+            <li>ţineţi apăsată tasta <b>Ctrl</b> şi daţi click pe mai multe coloane pentru a sorta înregistrările în funcţie de acestea;</li>
+            <li>pentru a reveni la sortarea după o singură coloană daţi click pe o alta fără a mai ţine apăsată tasta <b>Ctrl</b>.</li>
+        </ul>
+        
+        <p>Filtrare tabel:</p>
+        <ul>
+            <li>pentru aplicarea filtrelor trebuie apăsată tasta <b>Enter</b>.</li>
+        </ul>
+        
+        <p>Caractere simbol pentru filtrare tabel înregistrări:</p>
+        <p:panelGrid id="filter_char_panel" style="width: auto;">
+            <f:facet name='header'>
+                <p:row>
+                    <p:column>Simbol</p:column>
+                    <p:column>Descriere</p:column>
+                    <p:column>Exemplu</p:column>
+                </p:row>
+            </f:facet>
+            
+            <p:row>
+                <p:column>%</p:column>
+                <p:column>
+                    Caracter procent:
+                    <ul><li>găseşte orice text cu zero sau mai multe caractere</li></ul>
+                </p:column>
+                <p:column>
+                    <ul>
+                        <li><b>%auto%</b> - găseşte orice text care conţine termenul "auto"</li>
+                        <li><b>auto%</b> - găseşte orice text care începe cu termenul "auto"</li>
+                        <li><b>%bus</b> - găseşte orice text care se termină cu termenul "auto"</li>
+                    </ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>_</p:column>
+                <p:column>
+                    Caracter underscore:
+                    <ul><li>înlocuieşte un caracter</li></ul>
+                </p:column>
+                <p:column>
+                    <ul>
+                        <li><b>_ontrolling</b> - găseşte orice text care are 11 caractere şi se termină cu "ontrolling"</li>
+                    </ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>[ ]</p:column>
+                <p:column>
+                    Caracter(e) între coloane pătrate:
+                    <ul><li>găseşte orice caracter din intervalul sau succesiunea specificată</li></ul>
+                </p:column>
+                <p:column>
+                    <ul>
+                        <li><b>[a-m]test</b> - găseşte orice text care are 5 caracter şi începe cu o literă din intevalul "a-m" şi se termină cu "test"</li>
+                        <li><b>[abc]test</b> - găseşte orice text care are 5 caractere şi începe cu o literă din succesiunea "abc" şi se termină cu "test"</li>
+                        <li><b>[a-cms]test</b> - combinaţie între interval şi succesiune</li>
+                    </ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>[^]</p:column>
+                <p:column>
+                    Caractere pentru excludere:
+                    <ul><li>găseşte orice caracter care nu se regăseşte în intervalul sau succesiunea specificată</li></ul>
+                </p:column>
+                <p:column>
+                    <ul>
+                        <li><b>[^a-m]test</b> - găseşte orice text care are 5 caractere şi nu începe cu o literă din intevalul "a-m" şi se termină cu "test"</li>
+                        <li><b>[^abc]test</b> - găseşte orice text care are 5 caractere şi nu începe cu o literă din succesiunea "abc" şi se termină cu "test"</li>
+                        <li><b>[^a-cms]test</b> - combinaţie între interval şi succesiune</li>
+                    </ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>[]%</p:column>
+                <p:column>
+                    Valori nule, <b>nu exclude textul cu lungime zero</b> (în Excel textul cu lungime zero este reprezentat de ghilimele duble: "").
+                </p:column>
+                <p:column>
+                    <ul><li>secvenţă specifică doar acestei aplicaţii (adăugată programatic)</li></ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>[^]%</p:column>
+                <p:column>Valori non nule.</p:column>
+                <p:column>
+                    <ul><li>toate valorile, inclusiv textul cu lungime zero</li></ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column></p:column>
+                <p:column>Combinaţii:</p:column>
+                <p:column>
+                    <ul><li>
+                        <b>de[^a]%</b> - găseşte orice text care începe cu "de", următorul caracter nu este "a" şi are oricâte caractere după (sau niciunul)
+                    </li></ul>
+                </p:column>
+            </p:row>
+        </p:panelGrid>
+        
+        <p>Filtru câmp de tip dată:</p>
+        <ul>
+            <li>formatul pentru a filtra acest câmp este <b>AAAA-LL-ZZ HH:mm:ss</b> (ex.: <u style="margin: 10px;">2019-01-05 13:12:10</u>, <u style="margin: 10px;">2019-01-05%</u>, <u style="margin: 10px;">%-01-05 13:12:%</u>).</li>
+        </ul>
+    </p:panel>
+    
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>

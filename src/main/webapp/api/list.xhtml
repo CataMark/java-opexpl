@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['api.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['api.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{apisave.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty apisave.initError}">
+            <p:staticMessage severity="warn" detail="#{apisave.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty apisave.initError}">
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id='panel'>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <h:outputText value="#{uimess['col.dset']}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{apisave.dataset.id} #{apisave.dataset.nume} - #{apisave.dataset.vers} #{apisave.dataset.an}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <h:outputText value="#{uimess['col.coarea']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{apisave.coarea.cod} #{apisave.coarea.nume}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-procesare" title="#{uimess['api.btn.process.title']}" value="#{uimess['api.btn.process.value']}" icon='fa fa-cog'
+                                action="#{apisave.procesare()}" update="tabela" onstart="PF('block').show();" oncomplete="PF('block').hide();"/>
+                </p:menubar>
+
+                <p:panelGrid id="tabela" columns="3" layout="grid">
+                    <p:panel header="#{uimess['api.col.poz.plan']}" style="text-align: center;">
+                        <h:outputText value="#{apisave.data.get('poz_plan')}">
+                            <f:convertNumber pattern="#,##0"/>
+                        </h:outputText>
+                    </p:panel>
+                    <p:panel header="#{uimess['api.col.poz.aloc']}" style="text-align: center;">
+                        <h:outputText value="#{apisave.data.get('poz_aloc')}">
+                            <f:convertNumber pattern="#,##0"/>
+                        </h:outputText>
+                    </p:panel>
+                    <p:panel header="#{uimess['api.col.changed']}" style="text-align: center;">
+                        <h:outputText value="#{apisave.data.get('doc_mod_timp') gt apisave.data.get('val_mod_timp') ? apisave.data.get('doc_mod_timp') : apisave.data.get('val_mod_timp')}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:panel>
+                </p:panelGrid>
+
+                <p:panel header="#{uimess['api.col.adrese']}:" style="margin-top: 2px;">
+                    <ul>
+                        <li>#{request.scheme}://#{request.serverName}#{request.contextPath}/ws/model/alocare/csv/<b>{id set date}</b>/<b>{cod arie controlling}</b>/</li>
+                        <li>#{request.scheme}://#{request.serverName}#{request.contextPath}/ws/model/alocare/csv/<b>{id set date}</b>/<b>{cod arie controlling}</b>/<b>{tip valoare}</b>/</li>
+                        <li>#{request.scheme}://#{request.serverName}#{request.contextPath}/ws/model/alocare/csv/<b>{id set date}</b>/<b>{cod arie controlling}</b>/<b>{tip valoare}</b>/<b>{cod centru cost}</b>/</li>
+                    </ul>
+                </p:panel>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="init" name='init' action="#{apisave.datainit()}" update='list:tabela'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('block').hide();"/>
+            </h:form>
+            
+            <script>
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    init();
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

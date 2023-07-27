@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./WEB-INF/resources/fcomps/template_no_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ps="http://xmlns.jcp.org/jsf/passthrough">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['login.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['app.name']}</ui:define>
+    <ui:define name="lang-menu">
+        <ui:include src="WEB-INF/resources/fcomps/template_lang_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="user-menu"/>
+    
+    <ui:define name="content">
+        <div style="text-align: center; padding-top: 8em;">
+            <style type="text/css">
+                .col1{
+                    width: 6em;
+                }
+            </style>
+            <h:form id='login_old' ps:action="j_security_check" style="display: none;">
+                <p:panelGrid id='panel' columns="2" style="text-align: left;" layout="grid" columnClasses="col1, col2">
+                    <f:facet name="header">
+                        <h:outputText value="#{uimess['login.title']}"/>
+                    </f:facet>
+
+                    <p:outputLabel value="#{uimess['login.user']}" for='@next'/>
+                    <p:inputText id='kid' ps:name='j_username' placeholder="#{uimess['login.user.watermark']}" size="30" maxlength="255"/>
+                    
+                    <p:outputLabel value="#{uimess['login.pass']}" for="@next"/>
+                    <p:password id='pass' ps:name='j_password' placeholder="#{uimess['login.pass.watermark']}" size='30' maxlength="255"/>
+                    
+                    <f:facet name="footer">
+                        <p:commandButton id='submit' value="#{uimess['login.button']}" icon="fa fa-sign-in" ajax="false"/>
+                    </f:facet>
+                </p:panelGrid>
+            </h:form>
+            
+            <h:form id="login_new" ps:action="#{initParam['ro.any.c12153.AAD_AUTHORIZE_END_POINT']}" style="display: inline-block;">
+                <h:inputHidden ps:name="client_id" value="#{aadhelp.clientId}"/>
+                <h:inputHidden ps:name="response_type" value="id_token"/>
+                <h:inputHidden ps:name="redirect_uri" value="#{aadhelp.callback}"/>
+                <h:inputHidden ps:name="scope" value="openid profile"/>
+                <h:inputHidden ps:name="state" value="#{requestScope['javax.servlet.forward.request_uri']}#{empty request.queryString ? '' : '?'.concat(request.queryString)}"/>
+                <h:inputHidden ps:name="nonce" value="#{aadhelp.nonce}"/>
+                <h:inputHidden ps:name="response_mode" value="form_post"/>
+                <p:panelGrid id="panel">
+                    <p:row>
+                        <p:column style="text-align: center; height: 25em; width: 20em; vertical-align: middle;">
+                            <h:outputText value="#{uimess['login.title']}" style="font-size: 2em;"/><br/><br/>
+                            <p:commandButton id='submit' value="#{uimess['login.button']}" icon="fa fa-sign-in" ajax="false"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+        </div>
+        <script type="text/javascript">
+            /* <![CDATA[ */                
+            jQuery("#login_new").submit();
+            /* ]]> */
+        </script>
+    </ui:define>
+</ui:composition>

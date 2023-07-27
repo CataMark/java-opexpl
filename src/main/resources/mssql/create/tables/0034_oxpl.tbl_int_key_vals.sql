@@ -1,0 +1,22 @@
+create table oxpl.tbl_int_key_vals(
+    id uniqueidentifier not null constraint tbl_int_key_vals_df1 default newsequentialid(),
+    cheie int not null,
+    coarea char(4) not null,
+    buss_line char(4) not null,
+    hier char(5),
+    data_set int,
+    cost_centre varchar(10),
+    gen_data_set int not null,
+    an smallint not null,
+    valoare float not null,
+    mod_de varchar(20) not null,
+    mod_timp datetime not null constraint tbl_int_key_vals_df2 default current_timestamp,
+    constraint tbl_int_key_vals_pk primary key (id),
+    constraint tbl_int_key_vals_uq1 unique (cheie, coarea, buss_line, gen_data_set, cost_centre, an),
+    constraint tbl_int_key_vals_fk1 foreign key (cheie) references oxpl.tbl_int_key_head(id),
+    constraint tbl_int_key_vals_fk2 foreign key (coarea, buss_line) references oxpl.tbl_int_buss_line_asg(coarea, buss_line),
+    constraint tbl_int_key_vals_fk3 foreign key (hier, data_set, cost_centre) references oxpl.tbl_int_ccntr(hier, data_set, cod),
+    constraint tbl_int_key_vals_fk4 foreign key (gen_data_set) references oxpl.tbl_int_data_set(id),
+    constraint tbl_int_key_vals_ck1 check (an between 1900 and 9999),
+    constraint tbl_int_key_vals_ck2 check (valoare != 0)
+);

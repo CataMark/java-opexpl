@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['bline.asg.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['bline.asg.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{bussasglist.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty bussasglist.initError}">
+            <p:staticMessage severity="warn" detail="#{bussasglist.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+            
+        <c:if test="#{empty bussasglist.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id='panel'>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.coarea']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{bussasglist.coarea.cod} #{bussasglist.coarea.nume}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-add" title="#{uimess['bline.asg.btn.add.title']}" value="#{uimess['mess.add']}" icon='fa fa-plus'
+                                action="#{bussasglist.newItem()}" update='fdlg:dialog' process="@this" partialSubmit="true"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/bussasg_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['bline.asg.btn.add.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{bussasg.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-delete" title="#{uimess['bline.asg.btn.del.title']}" value="#{uimess['mess.del']}" icon="fa fa-trash"
+                                action="#{bussasglist.passSelected(false)}" update="fdlg:dialog"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/bussasg_delete.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['bline.asg.btn.del.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{bussasg.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                    <p:menuitem id="menu-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                    url="javascript:void(0)" onclick="PF('block').show(); PF('tabela').clearFilters();"/>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{bussasglist.list}' var='item' sortBy="#{item.buss_line}" filteredValue="#{bussasglist.filtered}"
+                             selectionMode="single" selection="#{bussasglist.selected}" rowKey="#{item.id}" reflow="true">
+                    <p:ajax event='filter' ignoreAutoUpdate="true" oncomplete="tableEndUpdate();"/>
+
+                    <p:column headerText="#{uimess['col.cod']}" filterBy="#{item.buss_line}" filterMatchMode="contains" filterValue="#{bussasglist.filterValues[0]}"
+                              filterMaxLength="4" filterStyle="width: 4em;">
+                        <h:outputText value="#{item.buss_line}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.segm']}" filterBy="#{item.buss_line_seg}" filterMatchMode="contains" filterValue="#{bussasglist.filterValues[1]}"
+                              filterMaxLength="2" filterStyle="width: 7em;">
+                        <h:outputText value="#{item.buss_line_seg}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.nume']}" filterBy="#{item.buss_line_nume}" filterMatchMode="contains" filterValue="#{bussasglist.filterValues[2]}"
+                              filterMaxLength="30">
+                        <h:outputText value="#{item.buss_line_nume}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:contextMenu for='tabela' selectionMode="single">                    
+                    <p:menuitem id="cntx-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete').click();"/>
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>        
+            
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true" fitViewport="true" blockScroll="true"
+                          closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="init" name="init" action="#{bussasglist.datainit()}" update="list:tabela"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>
+
+                <p:remoteCommand id="update" name="update" update="list:tabela"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>
+
+                <p:remoteCommand id='clear' name='clear' action="#{bussasglist.clear()}" update="fdlg:dialog"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

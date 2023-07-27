@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['users.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['users.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{usersByGroupList.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty usersByGroupList.initError}">
+            <p:staticMessage severity="warn" detail="#{usersByGroupList.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+            
+        <c:if test="#{empty usersByGroupList.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id="panel">
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <h:outputText value="#{uimess['col.group']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{usersByGroupList.group.cod} - #{usersByGroupList.group.nume}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-add" title="#{uimess['users.btn.add.title']}" value="#{uimess['mess.add']}" icon='fa fa-plus'
+                                action="#{usersByGroupList.newItem()}" update='fdlg:dialog' process="@this" partialSubmit="true"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/user_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['users.btn.add.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{usersByGroup.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-change" title="#{uimess['users.btn.chg.title']}" value="#{uimess['mess.chg']}" icon="fa fa-pencil"
+                                action="#{usersByGroupList.passSelected(true)}" update="fdlg:dialog"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/user_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['users.btn.chg.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{usersByGroup.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-delete" title="#{uimess['users.btn.del.title']}" value="#{uimess['mess.del']}" icon="fa fa-trash"
+                                action="#{usersByGroupList.passSelected(false)}" update="fdlg:dialog"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/user_remove_from_group.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['users.btn.del.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{usersByGroup.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    <!-- Nu este necesar la login cu Azure Active Directory
+                    <p:menuitem id="menu-passw" title="#{uimess['users.btn.pass.title']}" value="#{uimess['users.btn.pass.value']}" icon="fa fa-key"
+                                action="#{usersByGroupList.passSelected(false)}" update="fdlg:dialog"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/user_change_pass.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['users.btn.pass.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{usersByGroup.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+                    -->
+                    <p:menuitem id="menu-download" title="#{uimess['mess.xlsx.dwn.title']}" value="XLSX" icon="fa fa-download" ajax="false">
+                        <p:dataExporter type='xlsx' target="tabela" fileName="raport"/>
+                    </p:menuitem>
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>                        
+                    <p:menuitem id="menu-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                url="javascript:void(0)" onclick="PF('block').show(); PF('tabela').clearFilters();"/>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{usersByGroupList.list}' var='item' sortBy="#{item.uname}" filteredValue="#{usersByGroupList.filtered}"
+                             selectionMode="single" selection="#{usersByGroupList.selected}" rowKey="#{item.uname}" reflow="true">
+                    <p:ajax event='filter' ignoreAutoUpdate="true" oncomplete="tableEndUpdate();"/>
+
+                    <p:column headerText="#{uimess['col.kid']}" filterBy="#{item.uname}" filterMatchMode="contains" filterValue="#{usersByGroupList.filterValues[0]}"
+                              filterMaxLength="20" filterStyle="width: 6rem;">
+                        <h:outputText value="#{item.uname}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.nume']}" filterBy="#{item.prenume} #{item.nume}" filterMatchMode="contains"
+                              filterValue="#{usersByGroupList.filterValues[1]}" filterMaxLength="100">
+                        <h:outputText value="#{item.prenume} #{item.nume}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.email']}">
+                        <h:outputText value="#{item.email}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:contextMenu for="tabela" selectionMode="single">
+                    <p:menuitem id="cntx-change" value="#{uimess['mess.chg']}" icon="fa fa-pencil" url="javascript:void(0)" onclick="jQuery('#list\\:menu-change').click();"/>
+                    <p:menuitem id="cntx-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete').click();"/>
+                    <!-- Nu este necesar la login cu Azure Active Directory
+                    <p:menuitem id="cntx-passw" value="#{uimess['users.btn.pass.value']}" icon="fa fa-key" url="javascript:void(0)" onclick="jQuery('#list\\:menu-passw').click();"/>
+                    -->
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+            
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true" fitViewport="true" blockScroll="true"
+                          closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+            
+            <h:form id="funct">
+                <p:remoteCommand id="init" name="init" action="#{usersByGroupList.datainit()}" update="list:tabela"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>
+
+                <p:remoteCommand id="update" name="update" update="list:tabela"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>
+
+                <p:remoteCommand id='clear' name='clear' action="#{usersByGroupList.clear()}" update="fdlg:dialog"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+            
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

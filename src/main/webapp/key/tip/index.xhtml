@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['keys.tip.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['keys.tip.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <c:if test="#{not empty keyType.initError}">
+            <p:staticMessage severity="warn" detail="#{keyType.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty keyType.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style>
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+            
+            <h:form id="list">
+                <p:dataTable id="tabela" value="#{keyType.list}" var="item" sortBy="#{item.cod}"
+                             rowKey="#{item.cod}" reflow="true">
+                    
+                    <p:column headerText="#{uimess['col.cod']}">
+                        <h:outputText value="#{item.cod}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.nume']}">
+                        <h:outputText value="#{item.nume}"/>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.general']}">
+                        <span class="#{item.general? 'fa fa-check': ''}"></span>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.calculat']}">
+                        <span class="#{item.calculat? 'fa fa-check': ''}"></span>
+                    </p:column>
+                    
+                    <p:column headerText="#{uimess['col.user']}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+            
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

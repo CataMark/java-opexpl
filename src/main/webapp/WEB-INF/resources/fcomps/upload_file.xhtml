@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel tr.ui-widget-content:not(:last-child){
+            border-bottom: none;
+        }
+        #fdlg\:panel tr.ui-widget-content{
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{dbload.errorFileLoadInit}" rendered="#{not empty dbload.errorFileLoadInit}"/>
+    <p:panelGrid id="panel" rendered="#{empty dbload.errorFileLoadInit}">
+        <f:facet name="header">
+            <p:row>
+                <p:column colspan="2" style="text-align: left; font-weight: normal;">
+                    <h:outputText value="#{uimess['upload.head.1']}"/><br/>
+                    <h:outputText value="Maximum #{dbload.maxFileSize/1024/1024} MB."/><br/>
+                    <h:outputText value="#{uimess['upload.head.3']}"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['upload.field.delimitator']}" for="delimitator"/>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu id="delimitator" value="#{dbload.delimitator}" requiredMessage="#{uimess['upload.field.delimitator']}: #{uimess['mess.required']}">
+                    <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                    <f:selectItem itemLabel=", - #{uimess['upload.delim.comma']}" itemValue=","/>
+                    <f:selectItem itemLabel="; - #{uimess['upload.delim.semicolon']}" itemValue=";"/>
+                    <f:selectItem itemLabel="\t - tab" itemValue="\t"/>
+                    <f:selectItem itemLabel="&#124; - #{uimess['upload.delim.pipe']}" itemValue="\&#124;"/>
+                    <p:ajax event="change" process="@this" partialSubmit="true" update="@this"
+                            onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-block').show();"
+                            oncomplete="PF('dialog-block').hide(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                    <f:validateRequired/>
+                </p:selectOneMenu>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['upload.field.quotes']}" for="quotes"/>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu id="quotes" value="#{dbload.quote}">
+                    <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                    <f:selectItem itemLabel="&quot; - #{uimess['upload.quotes.ghilimele']}" itemValue="\&quot;"/>
+                    <f:selectItem itemLabel="&apos; - #{uimess['upload.quotes.apostrof']}" itemValue="\&apos;"/>
+                    <f:selectItem itemLabel="\&#92; - #{uimess['upload.quotes.backslash']}" itemValue="\&#92;"/>
+                    <f:selectItem itemLabel="&#47; - #{uimess['upload.quotes.slash']}" itemValue="\&#47;"/>
+                    <f:selectItem itemLabel="&#124; - #{uimess['upload.quotes.pipe']}" itemValue="\&#124;"/>
+                    <p:ajax event="change" process="@this" partialSubmit="true" update="@this"
+                            onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-block').show();"
+                            oncomplete="PF('dialog-block').hide(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:selectOneMenu>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column colspan="2">
+                <p:fileUpload id='upload' widgetVar="dialog-upload" mode="advanced" update="panel" dragDropSupport="false"
+                              fileUploadListener="#{dbload.loadFile}" process="delimitator,quotes"
+                              fileLimit="1" fileLimitMessage="#{uimess['err.upload.number']}"
+                              sizeLimit="#{dbload.maxFileSize}" invalidSizeMessage="#{uimess['err.upload.size']}"
+                              allowTypes="/(\.|\/)(csv|txt|CSV|TXT)$/" invalidFileMessage="#{uimess['err.upload.file.tip']}"
+                              required="true" requiredMessage="#{uimess['upload.field.fisier']}: #{uimess['mess.required']}"
+                              label="#{uimess['upload.field.fisier']}" chooseIcon="fa fa-search"
+                              uploadLabel="#{uimess['upload.btn.load']}" uploadIcon="fa fa-upload"
+                              cancelLabel="#{uimess['upload.btn.cancel']}" cancelIcon="fa fa-times"
+                              onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-block').show();"
+                              oncomplete="PF('dialog-block').hide(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+            </p:column>
+        </p:row>
+    </p:panelGrid>
+    
+    <p:blockUI id='block' widgetVar="dialog-block" block="panel"/>
+    
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>

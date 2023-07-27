@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <h:outputStylesheet>
+        #user-menu\:button:hover{
+            color: #cccccc !important;
+        }
+        #user-menu\:panel .ui-overlaypanel-content{
+            padding: 0;
+        }
+        #user-menu\:panel .ui-menu{
+            border: none;
+        }
+    </h:outputStylesheet>
+    <h:form id='user-menu' style="margin: 0;">
+        <p:link id="button" style="font-size: 1.7em; color: #ffffff; margin: 0 0.5rem;"
+                title="#{portal_user.user.prenume} #{portal_user.user.nume}" href="javascript:void(0)">
+            <span class="fa fa-user" style=""></span>
+        </p:link>
+        <p:overlayPanel id="panel" for="button" hideEffect="fade">
+            <p:menu>
+                <p:menuitem value="#{uimess['umenu.portal']}" icon="fa fa-home" action="/portal.xhtml?faces-redirect=true" ajax="false"/>
+                <p:menuitem value="#{uimess['umenu.logoff']}" icon="fa fa-sign-out" url="#{request.contextPath}/logoff"/>
+                <!-- Nu este necesar la login cu Azure Active Directory
+                <p:separator/>
+                <p:menuitem value="#{uimess['pass.title']}" icon="fa fa-key" action="/pass.xhtml?faces-redirect=true" ajax="false"/>
+                -->
+            </p:menu>
+        </p:overlayPanel>
+    </h:form>
+</ui:composition>

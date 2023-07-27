@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:outputStylesheet>
+        .meniu-evidentiat > h3:not(.ui-state-active) a{
+            color: #B00402 !important;
+            font-weight: bold !important;
+        }
+    </h:outputStylesheet>
+    <h:form id='opexpl-menu' style="margin: 0;">
+        <p:panelMenu id="panel">
+            <p:submenu id="gen" label="#{uimess['smenu.start']}">
+                <p:menuitem ajax="false" value="#{uimess['item.home']}" icon="fa fa-home" action="/index.xhtml?faces-redirect=true"/>
+            </p:submenu>
+            <p:submenu id="plan" label="#{uimess['smenu.plan']}" styleClass="meniu-evidentiat">
+                <p:menuitem ajax="false" value="#{uimess['item.key.spf']}" icon="fa fa-cog" action="/key/s01/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.plan.cc']}" icon="fa fa-pencil" action="/plan/ccenter/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.plan.cd']}" icon="fa fa-pencil" action="/plan/cdriver/index.xhtml?faces-redirect=true"/>
+            </p:submenu>
+            <p:submenu id="rap" label="#{uimess['smenu.raps']}" styleClass="meniu-evidentiat">
+                <p:menuitem ajax="false" value="#{uimess['item.rap.ccval']}" icon='fa fa-file' action="/raps/ccenter/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.rap.cdval']}" icon='fa fa-file' action="/raps/cdriver/index.xhtml?faces-redirect=true"/>
+            </p:submenu>
+            <p:submenu id="user" label="#{uimess['smenu.users']}">
+                <p:menuitem ajax="false" value="#{uimess['item.users.groups']}" icon="fa fa-list" action="/uadmin/groups/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.users.users']}" icon="fa fa-pencil" action="/uadmin/users/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.users.cc']}" icon="fa fa-pencil" action="/uadmin/usercc/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.users.cd']}" icon="fa fa-pencil" action="/uadmin/usercd/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.users.lauth']}" icon="fa fa-list" action="/uadmin/usess/index.xhtml?faces-redirect=true"/>
+            </p:submenu>
+            <p:submenu id="md" label="#{uimess['smenu.md']}">
+                <p:menuitem ajax="false" value="#{uimess['item.md.coarea']}" icon="fa fa-pencil" action="/md/coarea/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.icpart']}" icon="fa fa-pencil" action="/md/icpart/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.segs']}" icon="fa fa-pencil" action="/md/segind/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.bussline']}" icon="fa fa-pencil" action="/md/bussline/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.bussline.asg']}" icon="fa fa-pencil" action="/md/bussasg/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.per']}" icon="fa fa-pencil" action="/md/month/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.vers']}" icon="fa fa-pencil" action="/md/vers/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.dataset']}" icon="fa fa-pencil" action="/md/dset/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.ccgroup']}" icon="fa fa-pencil" action="/md/cgroup/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.ccntr']}" icon="fa fa-upload" action="/md/ccenter/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.cdriver']}" icon="fa fa-pencil" action="/md/cdriver/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.opexcat']}" icon="fa fa-upload" action="/md/ocateg/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.cdriver.asg']}" icon="fa fa-pencil" action="/md/cdriver/assign/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.md.opexcat.asg']}" icon="fa fa-pencil" action="/md/ocateg/assign/index.xhtml?faces-redirect=true"/>
+            </p:submenu>
+            <p:submenu id="key" label="#{uimess['smenu.keys']}">
+                <p:menuitem ajax="false" value="#{uimess['item.key.tip']}" icon="fa fa-list" action="/key/tip/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.key.gen']}" icon="fa fa-cog" action="/key/gen/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.key.rap1']}" icon="fa fa-file" action="/key/rap/index.xhtml?faces-redirect=true"/>
+            </p:submenu>
+            <p:submenu id="recs" label="#{uimess['smenu.mrecs']}">
+                <p:menuitem ajax="false" value="#{uimess['item.mrecs.actual']}" icon="fa fa-upload" action="/recs/actual/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.mrecs.map']}" icon="fa fa-upload" action="/recs/map/index.xhtml?faces-redirect=true"/>
+                <p:menuitem ajax="false" value="#{uimess['item.mrecs.plan']}" icon="fa fa-upload" action="/recs/plan/index.xhtml?faces-redirect=true"/>
+            </p:submenu>
+            <p:submenu id="admin" label="#{uimess['smenu.admin']}">
+                <p:menuitem ajax="false" value="#{uimess['item.admin.del']}" icon="fa fa-cog"/>
+                <p:menuitem ajax="false" value="#{uimess['item.admin.copy']}" icon="fa fa-cog"/>
+            </p:submenu>
+            <p:submenu id="api" label="#{uimess['smenu.api']}">
+                <p:menuitem ajax="false" value="#{uimess['item.api.save']}" icon="fa fa-save" action="/api/index.xhtml?faces-redirect=true"/>
+            </p:submenu>
+        </p:panelMenu>
+    </h:form>
+</ui:composition>

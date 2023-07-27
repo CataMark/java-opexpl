@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['cdriver.asg.nosel']}" rendered="#{empty cdriveras.selected}"/>
+    <p:staticMessage severity='warn' detail="#{cdriveras.initError}" rendered="#{not empty cdriveras.initError}"/>
+    <p:panelGrid id='panel' rendered="#{not empty cdriveras.selected and empty cdriveras.initError}">
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.cdriver']}"/>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu id="cdriver" value="#{cdriveras.selected.cod}" rendered="#{empty cdriveras.selected.mod_timp}"
+                                 filter="true" filterMatchMode="contains" validatorMessage="#{uimess['col.cdriver']}: #{uimess['mess.required']}">
+                    <f:validateRequired/>
+                    <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                    <f:selectItems value="#{cdriveras.notAssigned}" var="item" itemLabel="#{item.cod} #{item.nume}" itemValue="#{item.cod}"/>
+                </p:selectOneMenu>
+                
+                <h:outputText value="#{cdriveras.selected.cod} #{cdriveras.selected.nume}" rendered="#{not empty cdriveras.selected.mod_timp}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.blocat']}" for="blocat"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="blocat" value="#{cdriveras.selected.blocat}"/>
+            </p:column>
+        </p:row>
+        
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save"
+                             action="#{cdriveras.save()}" update="panel"
+                             onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                             oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

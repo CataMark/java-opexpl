@@ -1,0 +1,367 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['recs.actual.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['recs.actual.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{cmaplist.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty cmaplist.initError}">
+            <p:staticMessage severity="warn" detail="#{cmaplist.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+                    
+        <c:if test="#{empty cmaplist.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+                
+                #list .ui-tabs-nav{
+                    border-bottom: 1px solid #bebebe;
+
+                }
+                
+                #list .ui-tabs-panels{
+                    border-left: none !important;
+                    border-right: none !important;
+                    border-bottom: none !important;
+                }
+                
+                #list .ui-tabs-panel{
+                    padding-left: 0 !important;
+                    padding-right: 0 !important;
+                    padding-bottom: 0 !important;
+                }
+                
+                #list .ui-tabs-selected{
+                    font-weight: bold;
+                }
+
+                #list\:taburi\:tabela-map table,
+                #list\:taburi\:tabela-nmap table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+                
+                .ui-menubar .ui-menu-child li{
+                    display: block;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id='panel'>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <h:outputText value="#{uimess['col.dset']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{cmaplist.dataset.id} #{cmaplist.dataset.nume} - #{cmaplist.dataset.vers} #{cmaplist.dataset.an}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <h:outputText value="#{uimess['col.coarea']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{cmaplist.coarea.cod} #{cmaplist.coarea.nume}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='list'>
+                <p:tabView id="taburi" dynamic="true">
+                    <p:ajax event="tabChange" listener="#{cmaplist.onTabChange}" onstart="PF('block').show();" oncomplete="update();"/>
+
+                    <p:tab title="#{uimess['ccmap.tab.unmap.title']}" id="not-mapped">
+                        <f:facet name="actions">
+                            <p:menubar>
+                                <p:menuitem id="menu-map" title="#{uimess['ccmap.btn.map.title']}" value="#{uimess['ccmap.btn.map.value']}" icon='fa fa-pencil'
+                                            action="#{cmaplist.passSelected(true)}" update='fdlg:dialog' partialSubmit="true" process="not-mapped"
+                                            onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                                    <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/ccentermap_save.xhtml" target="#{dialog.address}"/>
+                                    <f:setPropertyActionListener value="#{uimess['ccmap.btn.map.title']}" target="#{dialog.title}"/>
+                                    <f:setPropertyActionListener value="PF('dialog').hide(); updateNotMapped();" target="#{cmap.finishScript}"/>
+                                    <p:resetInput target="fdlg:dialog"/>
+                                </p:menuitem>
+                                <p:menuitem id="menu-nmap-download" title="#{uimess['ccmap.btn.down.notmap.title']}" value="XLSX" icon="fa fa-download" ajax="false">
+                                    <p:dataExporter type='xlsx' target="tabela-nmap" fileName="raport"/>
+                                </p:menuitem>
+                                <p:menuitem id="menu-nmap-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                            oncomplete="initNotMapped();"/>
+                                <p:menuitem id="menu-nmap-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                                url="javascript:void(0)" onclick="PF('block').show(); PF('tabela-nmap').clearFilters();"/>
+                            </p:menubar>
+                        </f:facet>
+
+                        <p:dataTable id='tabela-nmap' widgetVar="tabela-nmap" value="#{cmaplist.notMapped}" var="item"
+                                     sortBy='#{item.sender}' selectionMode="single" selection="#{cmaplist.selected}"
+                                     rowKey='#{item.sender}' filteredValue="#{cmaplist.filtered}">
+                            <p:ajax event='filter' ignoreAutoUpdate="true" oncomplete="tableNotMappedEndUpdate();"/>
+
+                            <p:column headerText="#{uimess['col.cod']}" filterBy="#{item.sender}" filterMatchMode="contains"
+                                      filterValue="#{cmaplist.filterValues[0]}" filterMaxLength="10" filterStyle="max-width: 7em;">
+                                <h:outputText value="#{item.sender}"/>
+                            </p:column>
+                            <p:column headerText="#{uimess['col.nume']}" filterBy="#{item.sender_nume}" filterMatchMode="contains"
+                                      filterValue="#{cmaplist.filterValues[1]}"  filterMaxLength="30">
+                                <h:outputText value="#{item.sender_nume}"/>
+                            </p:column>
+                            <p:column headerText="#{uimess['ccmap.col.val.set.comp']}" style="text-align: right;">
+                                <h:outputText value="#{item.val_compar_set}">
+                                    <f:convertNumber pattern="###,##0"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{uimess['ccmap.col.val.set.actual']}" style="text-align: right;">
+                                <h:outputText value="#{item.val_actual_set}">
+                                    <f:convertNumber pattern="###,##0"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:columnGroup type="footer">
+                                <p:row>
+                                    <p:column footerText="Total" colspan="2" style="text-align: left;"/>
+                                    <p:column style="text-align: right;">
+                                        <f:facet name="footer">
+                                            <h:outputText id="sum1" value="#{cmaplist.totalComparSetVal}">
+                                                <f:convertNumber maxFractionDigits="0" pattern="#,###.##"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                    </p:column>
+                                    <p:column style="text-align: right;">
+                                        <f:facet name="footer">
+                                            <h:outputText id="sum2" value="#{cmaplist.totalActualSetVal}">
+                                                <f:convertNumber maxFractionDigits="0" pattern="#,###.##"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                    </p:column>
+                                </p:row>
+                            </p:columnGroup>
+                        </p:dataTable>
+
+                        <p:contextMenu for='tabela-nmap' selectionMode="single">
+                            <p:menuitem id="cntx-map" value="#{uimess['ccmap.btn.map.value']}" icon='fa fa-pencil' url="javascript:void(0)" onclick="jQuery('#list\\:taburi\\:menu-map').click();"/>
+                            <p:menuitem id="cntx-npam-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:taburi\\:menu-nmap-refresh').click();"/>
+                        </p:contextMenu>
+                    </p:tab>
+
+                    <p:tab title="#{uimess['ccmap.tab.map.title']}" id="mapped">
+                        <f:facet name="actions">
+                            <p:menubar>
+                                <p:menuitem id="menu-change" title="#{uimess['ccmap.btn.chg.title']}" value="#{uimess['mess.chg']}" icon='fa fa-pencil'
+                                        action="#{cmaplist.passSelected(true)}" update='fdlg:dialog' partialSubmit="true" process="mapped"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                                    <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/ccentermap_save.xhtml" target="#{dialog.address}"/>
+                                    <f:setPropertyActionListener value="#{uimess['ccmap.btn.chg.title']}" target="#{dialog.title}"/>
+                                    <f:setPropertyActionListener value="PF('dialog').hide(); updateMapped();" target="#{cmap.finishScript}"/>
+                                    <p:resetInput target="fdlg:dialog"/>
+                                </p:menuitem>
+
+                                <p:submenu label="#{uimess['mess.del']}" icon="fa fa-trash">
+                                    <p:menuitem id="menu-delete-sel" title="#{uimess['ccmap.btn.del.sel.title']}" value="#{uimess['ccmap.btn.del.sel.value']}" icon='fa fa-trash'
+                                        action="#{cmaplist.passSelected(false)}" update='fdlg:dialog' partialSubmit="true" process="mapped"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/ccentermap_delete_by_id.xhtml" target="#{dialog.address}"/>
+                                        <f:setPropertyActionListener value="#{uimess['ccmap.btn.del.sel.dialog']}" target="#{dialog.title}"/>
+                                        <f:setPropertyActionListener value="PF('dialog').hide(); updateMapped();" target="#{cmap.finishScript}"/>
+                                        <p:resetInput target="fdlg:dialog"/>
+                                    </p:menuitem>
+                                    <p:menuitem id="menu-delete-all" title="#{uimess['ccmap.btn.del.all.title']}" value="#{uimess['ccmap.btn.del.all.value']}" icon='fa fa-trash'
+                                        update='fdlg:dialog' partialSubmit="true" process="mapped"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/ccentermap_delete_all.xhtml" target="#{dialog.address}"/>
+                                        <f:setPropertyActionListener value="#{uimess['ccmap.btn.del.all.dialog']}" target="#{dialog.title}"/>
+                                        <f:setPropertyActionListener value="PF('dialog').hide(); updateMapped();" target="#{cmaplist.finishScript}"/>
+                                        <p:resetInput target="fdlg:dialog"/>
+                                    </p:menuitem>
+                                </p:submenu>
+
+                                <p:submenu label="#{uimess['upload.btn.load']}" icon="fa fa-upload">
+                                    <p:menuitem id="menu-load-templ" title="#{uimess['upload.menu.load.templ.title']}" value="#{uimess['upload.menu.load.templ.value']}" icon="fa fa-table"
+                                        update="fdlg:dialog" partialSubmit="true" process="@this"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/ccentermap_load_templ.xhtml" target="#{dialog.address}"/>
+                                        <f:setPropertyActionListener value="#{uimess['upload.menu.load.templ.dialog']}" target="#{dialog.title}"/>
+                                    </p:menuitem>
+                                    <p:menuitem id="menu-load-text" title="#{uimess['upload.menu.load.text.title']}" value="#{uimess['upload.menu.load.text.value']}" icon="fa fa-paste"
+                                        update="fdlg:dialog" partialSubmit="true" process="@this"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                                        <f:setPropertyActionListener value="oxpl.tbl_int_ccntr_map" target="#{dbload.tabela}"/>
+                                        <f:setPropertyActionListener value='["hier","data_set"]' target="#{dbload.colNames}"/>
+                                        <f:setPropertyActionListener value='["#{cmaplist.coarea.hier}","#{cmaplist.dataset.id}"]' target="#{dbload.colValues}"/>
+
+                                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_text.xhtml" target="#{dialog.address}"/>
+                                        <f:setPropertyActionListener value="#{uimess['upload.menu.load.text.dialog']}" target="#{dialog.title}"/>
+                                        <f:setPropertyActionListener value="PF('dialog').hide(); initMapped();" target="#{dbload.finishScript}"/>
+                                        <p:resetInput target="fdlg:dialog"/>
+                                    </p:menuitem>
+                                    <p:menuitem id="menu-load-file" title="#{uimess['upload.menu.load.file.title']}" value="#{uimess['upload.menu.load.file.value']}" icon="fa fa-file"
+                                        update="fdlg:dialog" partialSubmit="true" process="@this"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                                        <f:setPropertyActionListener value="oxpl.tbl_int_ccntr_map" target="#{dbload.tabela}"/>
+                                        <f:setPropertyActionListener value="#{20*1024*1024}" target="#{dbload.maxFileSize}"/>
+                                        <f:setPropertyActionListener value='["hier","data_set"]' target="#{dbload.colNames}"/>
+
+                                        <f:setPropertyActionListener value='["#{cmaplist.coarea.hier}","#{cmaplist.dataset.id}"]' target="#{dbload.colValues}"/>
+                                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_file.xhtml" target="#{dialog.address}"/>
+                                        <f:setPropertyActionListener value="#{uimess['upload.menu.load.file.dialog']}" target="#{dialog.title}"/>
+                                        <f:setPropertyActionListener value="PF('dialog').hide(); initMapped();" target="#{dbload.finishScript}"/>
+                                        <p:resetInput target="fdlg:dialog"/>            
+                                    </p:menuitem>                                   
+                                </p:submenu>
+
+                                <p:menuitem id="menu-map-download" title="#{uimess['ccmap.btn.down.map.title']}" value="XLSX" icon="fa fa-download" ajax="false">
+                                    <p:dataExporter type='xlsx' target="tabela-map" fileName="raport"/>
+                                </p:menuitem>
+                                <p:menuitem id="menu-map-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                            oncomplete="initMapped();"/>
+                                <p:menuitem id="menu-map-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                                url="javascript:void(0)" onclick="PF('block').show(); PF('tabela-map').clearFilters();"/>
+                            </p:menubar>
+                        </f:facet>
+
+                        <p:dataTable id="tabela-map" widgetVar="tabela-map" value="#{cmaplist.mapped}" var="item" expandableRowGroups="true"
+                                     sortBy="#{empty item.id ? uimess['ccmap.label.default'] : uimess['ccmap.label.user']}"
+                                     selectionMode="single" selection="#{cmaplist.selected}" rowKey="#{item.row_id}" filteredValue="#{cmaplist.filtered}">
+                            <p:ajax event='filter' ignoreAutoUpdate="true" oncomplete="tableMappedEndUpdate();"/>
+
+                            <p:headerRow>
+                                <p:column colspan="7">
+                                    <h:outputText value="#{empty item.id ? uimess['ccmap.label.default'] : uimess['ccmap.label.user']}"/>
+                                </p:column>
+                            </p:headerRow>
+
+                            <p:column headerText="Id">
+                                <h:outputText value="#{item.id.substring(0,8)}" rendered="#{not empty item.id}"/>
+                            </p:column>
+                            <p:column headerText="#{uimess['ccmap.col.sender.cod']}" filterBy="#{item.sender}" filterMatchMode="contains"
+                                      filterValue="#{cmaplist.filterValues[0]}" filterMaxLength="10" filterStyle="max-width: 7em;">
+                                <h:outputText value="#{item.sender}"/>
+                            </p:column>
+                            <p:column headerText="#{uimess['ccmap.col.sender.nume']}" filterBy="#{item.sender_nume}" filterMatchMode="contains"
+                                      filterValue="#{cmaplist.filterValues[1]}" filterMaxLength="30">
+                                <h:outputText value="#{item.sender_nume}"/>
+                            </p:column>
+                            <p:column headerText="#{uimess['ccmap.col.receiver.cod']}" filterBy="#{item.receiver}" filterMatchMode="contains"
+                                      filterValue="#{cmaplist.filterValues[2]}" filterMaxLength="10" filterStyle="max-width: 7em;">
+                                <h:outputText value="#{item.receiver}"/>
+                            </p:column>
+                            <p:column headerText="#{uimess['ccmap.col.receiver.nume']}" filterBy="#{item.receiver_nume}" filterMatchMode="contains"
+                                      filterValue="#{cmaplist.filterValues[3]}" filterMaxLength="10">
+                                <h:outputText value="#{item.receiver_nume}"/>
+                            </p:column>
+                            <p:column headerText="#{uimess['col.user']}">
+                                <h:outputText value="#{item.mod_de}"/>
+                            </p:column>
+                            <p:column headerText="#{uimess['col.time']}">
+                                <h:outputText value="#{item.mod_timp}" rendered="#{not empty item.mod_timp}">
+                                    <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+
+                        <p:contextMenu for='tabela-map' selectionMode="single">
+                            <p:menuitem id="cntx-change" value="#{uimess['mess.chg']}" icon='fa fa-pencil' url="javascript:void(0)" onclick="jQuery('#list\\:taburi\\:menu-change').click();"/>
+                            <p:menuitem id="cntx-delete-sel" value="#{uimess['ccmap.btn.del.sel.value']}" icon='fa fa-trash' url="javascript:void(0)" onclick="jQuery('#list\\:taburi\\:menu-delete-sel').click();"/>
+                            <p:menuitem id="cntx-map-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:taburi\\:menu-map-refresh').click();"/>
+                        </p:contextMenu>
+                    </p:tab>
+                </p:tabView>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true"
+                          fitViewport="true" blockScroll="true"
+                          closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+        
+            <h:form>
+                <p:remoteCommand id="initMapped" name='initMapped' action="#{cmaplist.listMappedInit()}" update='list:taburi:tabela-map'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela-map').filter();"/>
+
+                <p:remoteCommand id="updateMapped" name="updateMapped" update='list:taburi:tabela-map'
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela-map').filter();"/>
+
+                <p:remoteCommand id="initNotMapped" name='initNotMapped' action="#{cmaplist.listNotMappedInit()}" update="list:taburi:tabela-nmap"
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela-nmap').filter();"/>
+
+                <p:remoteCommand id="updateNotMapped" name="updateNotMapped" update="list:taburi:tabela-nmap"
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="PF('tabela-nmap').filter();"/>
+
+                <p:remoteCommand id="clear" name="clear" action="#{cmaplist.clear()}" update="fdlg:dialog"
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+            
+            <script>
+                /* <![CDATA[ */
+                function tableNotMappedEndUpdate(){
+                    PF('block').hide();
+                    jQuery('#list\\:taburi\\:tabela-nmap table').stickyTableHeaders();
+                }
+
+                function tableMappedEndUpdate(){
+                    PF('block').hide();
+                    jQuery('#list\\:taburi\\:tabela-map table').stickyTableHeaders();
+                }
+                
+                function update(){
+                     if (jQuery('#list\\:taburi\\:tabela-nmap').length > 0) updateNotMapped();
+                     if (jQuery('#list\\:taburi\\:tabela-map').length > 0) updateMapped();
+                }
+
+                jQuery(document).ready(function() {
+                    if (jQuery('#list\\:taburi\\:tabela-nmap').length > 0) {
+                        initNotMapped();
+                    } else if (jQuery('#list\\:taburi\\:tabela-map').length > 0){
+                        initMapped();
+                    }
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

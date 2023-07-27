@@ -1,0 +1,257 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <style>
+        #fdlg .ui-panelgrid tr,
+        #fdlg .ui-panelgrid td{
+            border: none;
+        }
+        
+        #fdlg .ui-tabs-nav{
+            border-bottom: 1px solid #bebebe;
+            
+        }
+        
+        #fdlg .ui-tabs-panels{
+            border-left: none !important;
+            border-right: none !important;
+            border-bottom: none !important;
+        }
+
+        #fdlg .ui-tabs-panel{
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        #fdlg .ui-tabs-selected{
+            font-weight: bold;
+        }
+        
+        #fdlg\:taburi\:sheet-vals .ui-datatable-header,
+        #fdlg\:taburi\:sheet-key .ui-datatable-header{
+            background: none;
+            border: none;
+            text-align: left;
+            color: black;
+        }
+        
+        #fdlg\:taburi\:sheet-vals .wtHolder,
+        #fdlg\:taburi\:sheet-key .wtHolder{
+            width: auto !important;
+        }
+        
+        #fdlg\:taburi\:sheet-vals .handsontableInputHolder,
+        #fdlg\:taburi\:sheet-key .handsontableInputHolder{
+            z-index: auto !important;
+        }
+        
+        #fdlg\:taburi\:sheet-vals td.alignRight,
+        #fdlg\:taburi\:sheet-key td.alignRight{
+            text-align: right;
+        }
+        
+        #fdlg\:taburi\:sheet-vals td:not(.htDimmed),
+        #fdlg\:taburi\:sheet-key td:not(.htDimmed){
+            background-color: #e6f2ff;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['plan.nosel']}" rendered="#{empty plandoc.selected}"/>
+    <p:staticMessage severity="warn" detail="#{uimess['plan.ccenter.blocat']}" rendered="#{not plandoc.renderSaveBtn and plandoc.selected.cost_center_blocat}"/>
+    <p:staticMessage severity="warn" detail="#{uimess['plan.categ.blocat']}" rendered="#{not plandoc.renderSaveBtn and plandoc.selected.opex_categ_blocat}"/>    
+    <p:staticMessage severity="warn" detail="#{uimess['plan.icpart.blocat']}" rendered="#{not plandoc.renderSaveBtn and plandoc.selected.ic_part_blocat}"/>
+    <p:staticMessage severity='warn' detail="#{plandoc.initError}" rendered="#{not empty plandoc.initError}"/>    
+    <c:if test="#{not empty plandoc.selected and empty plandoc.initError}">
+        <p:panelGrid id='panel-top' rendered="#{plandoc.renderSaveBtn}">
+            <p:row>
+                <p:column>
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save"
+                                     action="#{plandoc.save()}" update="panel-top"
+                                     onstart="disable();" oncomplete="enable();"/>
+                </p:column>
+            </p:row>
+            <p:row>
+                <p:column>
+                    <p:messages closable="true"/>
+                </p:column>
+            </p:row>
+        </p:panelGrid>
+
+        <p:tabView id="taburi">
+            <p:ajax event="tabChange" listener="#{plandoc.onTabChange}"/>
+            
+            <p:tab title="#{uimess['col.def']}" id='definitie'>
+                <p:panelGrid id='panel-definitie'>
+                    <p:row rendered="#{not empty plandoc.selected.mod_timp}">
+                        <p:column>
+                            <p:outputLabel value="Id:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{plandoc.selected.id}"/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.descr']}" for='descr'/>
+                        </p:column>
+                        <p:column>
+                            <p:inputTextarea id='descr' value="#{plandoc.selected.descr}" rows='6' cols='30'
+                                             maxlength="2000" autoResize="false"
+                                             validatorMessage="#{uimess['col.def']} -> #{uimess['col.descr']}: #{uimess['mess.required']}">
+                                <f:validateRequired/>         
+                            </p:inputTextarea>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.cdriver']}"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="cdriver" value="#{plandoc.selected.cost_driver}"
+                                            filter="true" filterMatchMode="contains" rendered="#{plandoc.renderCdriverSel}"
+                                            validatorMessage="#{uimess['col.def']} -> #{uimess['col.cdriver']}: #{uimess['mess.required']}">
+                                <f:validateRequired/>
+                                <p:ajax event="valueChange" listener="#{plandoc.onCdriverChange()}" update="ocateg"
+                                        partialSubmit="true" process="@this"
+                                        onstart="disable();" oncomplete="enable();"/>
+                                
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{plandoc.cdrivers}" var="item" itemLabel="#{item.cod} #{item.nume}" itemValue="#{item.cod}"/>
+                            </p:selectOneMenu>
+                            
+                            <h:outputText value="#{plandoc.selected.cost_driver} #{plandoc.selected.cost_driver_nume}"
+                                          rendered="#{not plandoc.renderCdriverSel}"/>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.categ']}"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="ocateg" value="#{plandoc.selected.opex_categ}"
+                                            filter="true" filterMatchMode="contains" rendered="#{plandoc.renderOcategSel}"
+                                            validatorMessage="#{uimess['col.def']} -> #{uimess['col.categ']}: #{uimess['mess.required']}">
+                                <f:validateRequired/>
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{plandoc.ocategs}" var="item" itemLabel="#{item.nume}" itemValue="#{item.cod}"/>
+                            </p:selectOneMenu>
+                            
+                            <h:outputText value="#{plandoc.selected.opex_categ_nume}" style="#{plandoc.selected.opex_categ_blocat ? 'text-decoration: line-through;' : ''}"
+                                          rendered="#{not plandoc.renderOcategSel}"/>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.partener']}"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="icpart" value="#{plandoc.selected.ic_part}"
+                                             filter="true" filterMatchMode="contains" rendered="#{plandoc.renderIcPartSel}">
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{plandoc.partners}" var="item" itemLabel="#{item.cod} #{item.nume}" itemValue="#{item.cod}"/>
+                            </p:selectOneMenu>
+                            
+                            <h:outputText value="#{plandoc.selected.ic_part} #{plandoc.selected.ic_part_nume}" style="#{plandoc.selected.ic_part_blocat ? 'text-decoration: line-through;' : ''}"
+                                          rendered="#{not plandoc.renderIcPartSel}"/>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row rendered="#{plandoc.coarea.alocare}">
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.cheie']}"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="cheie" value="#{plandoc.selected.cheie}"
+                                            filter="true" filterMatchMode="contains" rendered="#{plandoc.renderCheieSel}"
+                                            validatorMessage="#{uimess['col.def']} -> #{uimess['col.cheie']}: #{uimess['mess.required']}">
+                                <p:ajax event="valueChange" listener="#{plandoc.onKeyChange}" partialSubmit="true" process="@this"/>
+                                <f:validateRequired/>
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{plandoc.chei}"/>
+                            </p:selectOneMenu>
+                            
+                            <h:outputText value="#{plandoc.selected.cheie} #{plandoc.selected.cheie_nume}" style="#{plandoc.selected.cheie_blocat ? 'text-decoration: line-through;' : ''}"
+                                          rendered="#{not plandoc.renderCheieSel}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+             </p:tab>
+
+            <p:tab title="#{uimess['col.valori']}" id='vals'>                
+                <pe:sheet id="sheet-vals" value="#{plandoc.valori}" var="row" rowKey="#{row.an} #{row.per}"
+                          showRowHeaders="false">
+                    <p:ajax event="change" update="@this" partialSubmit="true" process="@this"/>
+                    
+                    <f:facet name="header">
+                        <c:forEach items="#{plandoc.ani}" var="an">
+                            <h:outputText value="#{an}: " style="font-weight: bold;"/>
+                            <h:outputText value="#{plandoc.getValSumByAn(an)}">
+                                <f:convertNumber maxFractionDigits="2" pattern="#,##0.00"/>
+                            </h:outputText>
+                            <p:spacer width="10"/>
+                        </c:forEach>
+                    </f:facet>
+                    
+                    <pe:sheetcolumn headerText="#{uimess['col.perioada']}" readOnly="true" value="#{row.an}.#{row.per}"/>
+                    <pe:sheetcolumn headerText="#{uimess['col.valoare']}" value="#{row.valoare}" readonlyCell="#{row.actual or not plandoc.renderSaveBtn}" styleClass="alignRight">
+                        <f:converter converterId="sheetCellFormulaConverter"/>
+                    </pe:sheetcolumn>
+                </pe:sheet>
+                <div style="width: 20em;">
+                    <h:outputText style="font-style: italic; color: #666666;" value="#{uimess['mess.sheet.formula.info']}"/>
+                </div>
+            </p:tab>
+            
+            <p:tab title="#{uimess['col.alocare']}" id='key' rendered="#{plandoc.coarea.alocare}">
+                <pe:sheet id="sheet-key" value="#{plandoc.cheie_vals}" var="row" rowKey="#{row.cod}"
+                          showRowHeaders="false">
+                    
+                    <pe:sheetcolumn headerText="#{uimess['col.bline']}" readOnly="true" value="#{row.cod} #{row.segment} #{row.nume}"/>
+                    <c:forEach items="#{plandoc.ani}" var="an">
+                        <pe:sheetcolumn headerText="#{an} (%)" value="#{plandoc.getKeyValPercentByAn(row.getCellByAn(an).valoare, an)}" readOnly="true" styleClass="alignRight">
+                            <f:convertNumber maxFractionDigits="2" pattern="#%"/>
+                        </pe:sheetcolumn>
+                    </c:forEach>
+                </pe:sheet>
+            </p:tab>
+        </p:tabView>
+        
+        <p:remoteCommand id="updateKeyVals" name="updateKeyVals" update="fdlg:taburi:sheet-key" partialSubmit="true" process="@this"
+                                onstart="disable();" oncomplete="enable();"/>
+    </c:if>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        function disable(){
+            jQuery('#fdlg\\:progress').show();
+            if (jQuery("#fdlg\\:panel-top").length > 0) PF('dialog-save').disable();
+        }
+        
+        function enable(){
+            if (jQuery("#fdlg\\:panel-top").length > 0) PF('dialog-save').enable();
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        }
+        
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

@@ -1,0 +1,93 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegSalesConn: 'AzureContainerRegistryConnection'
+  dockerRegAnyConn: 'AnyContainerRegistryConnection'
+  imageRepository: 'c12153/opexpl'
+  tag: '$(Build.BuildId)'
+  
+  # Agent VM image name
+  #vmImageName: 'ubuntu-latest'
+
+steps:
+- task: MavenAuthenticate@0
+  displayName: mavenAuthenticate
+  inputs:
+    artifactsFeeds: 'OpexplFeed'
+- task: Maven@3
+  displayName: mavenBuild
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.8'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: false
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    goals: 'package'
+#Sales image #################################
+- task: Docker@2
+  displayName: dockerLoginSales
+  inputs:
+    containerRegistry: $(dockerRegSalesConn)
+    command: 'login'
+- task: Docker@2
+  displayName: dockerBuildSales
+  inputs:
+    containerRegistry: $(dockerRegSalesConn)
+    command: 'build'
+    Dockerfile: DockerfileSales
+    repository: $(imageRepository)
+    tags: |
+      $(tag)
+- task: Docker@2
+  displayName: dockerPushSales
+  inputs:
+    containerRegistry: $(dockerRegSalesConn)
+    command: 'push'
+    repository: $(imageRepository)
+    tags: |
+      $(tag)
+- task: Docker@2
+  displayName: dockerLogoutSales
+  inputs:
+    containerRegistry: $(dockerRegSalesConn)
+    command: 'logout'
+#ANY image #################################
+- task: Docker@2
+  displayName: dockerLoginANY
+  inputs:
+    containerRegistry: $(dockerRegAnyConn)
+    command: 'login'
+- task: Docker@2
+  displayName: dockerBuildANY
+  inputs:
+    containerRegistry: $(dockerRegAnyConn)
+    command: 'build'
+    Dockerfile: DockerfileANY
+    repository: $(imageRepository)
+    tags: |
+      $(tag)
+- task: Docker@2
+  displayName: dockerPushANY
+  inputs:
+    containerRegistry: $(dockerRegAnyConn)
+    command: 'push'
+    repository: $(imageRepository)
+    tags: |
+      $(tag)
+- task: Docker@2
+  displayName: dockerLogoutANY
+  inputs:
+    containerRegistry: $(dockerRegAnyConn)
+    command: 'logout'

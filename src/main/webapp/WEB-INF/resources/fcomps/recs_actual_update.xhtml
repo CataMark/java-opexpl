@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+
+    <p:staticMessage severity='warn' detail="#{uimess['recs.norecs']}" rendered="#{empty arecs.list.wrappedData}"/>
+    <c:if test="#{not empty arecs.list.wrappedData}">
+        <p:panelGrid id="panel">
+            <f:facet name="header">
+                <p:row>
+                    <p:column colspan="3" style="text-align: left;">
+                        <p:messages closable="true"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputText value="#{uimess['col.camp']}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{uimess['col.valoare']}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{uimess['col.empty']}"/>
+                    </p:column>
+                </p:row>
+            </f:facet>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['col.ccenter']}" for="ccenter_cod"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="ccenter_cod" value="#{arecs.updateValues.centru_cost_cod.value}" size="10" maxlength="10"
+                                 validatorMessage="#{uimess['col.ccenter']}: #{uimess['valid.1to10capitordigit']}">
+                        <f:validateLength minimum="1" maximum="10"/>
+                        <f:validateRegex pattern="[0-9A-Z]+"/>
+                    </p:inputText>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="ccenter_cod_empty" value="#{arecs.updateValues.centru_cost_cod.goleste}"
+                                rendered="#{not arecs.updateValues.centru_cost_cod.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['recs.col.ccenter.nume']}" for="ccenter_nume"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="ccenter_nume" value="#{arecs.updateValues.centru_cost_nume.value}" size="30" maxlength="50"
+                                 validatorMessage="#{uimess['recs.col.ccenter.nume']}: #{uimess['valid.1to50chars']}">
+                        <f:validateLength minimum="1" maximum="50"/>
+                    </p:inputText>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="ccenter_nume_empty" value="#{arecs.updateValues.centru_cost_nume.goleste}"
+                                rendered="#{not arecs.updateValues.centru_cost_nume.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['col.cont']}" for="cont_cod"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="cont_cod" value="#{arecs.updateValues.cont_ccoa_cod.value}" size="10" maxlength="10"
+                                 validatorMessage="#{uimess['col.cont']}: #{uimess['valid.10numbers']}">
+                        <f:validateLength minimum="10" maximum="10"/>
+                        <f:validateRegex pattern="[0-9]+"/>
+                    </p:inputText>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="cont_cod_empty" value="#{arecs.updateValues.cont_ccoa_cod.goleste}"
+                                             rendered="#{not arecs.updateValues.cont_ccoa_cod.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['recs.col.cont.nume']}" for="cont_nume"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="cont_nume" value="#{arecs.updateValues.cont_ccoa_nume.value}" size="30" maxlength="50"
+                                 validatorMessage="#{uimess['recs.col.cont.nume']}: #{uimess['valid.1to50chars']}" >
+                        <f:validateLength minimum="1" maximum="50"/>
+                    </p:inputText>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="cont_nume_empty" value="#{arecs.updateValues.cont_ccoa_nume.goleste}"
+                                             rendered="#{not arecs.updateValues.cont_ccoa_nume.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['col.categ']}" for="ocateg_cod"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="ocateg_cod" value="#{arecs.updateValues.opex_categ_cod.value}" size="5" maxlength="5"
+                                 validatorMessage="#{uimess['col.categ']}: #{uimess['valid.5numbers']}" >
+                        <f:validateLength minimum="5" maximum="5"/>
+                        <f:validateRegex pattern="[0-9]+"/>
+                    </p:inputText>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="ocateg_cod_empty" value="#{arecs.updateValues.opex_categ_cod.goleste}"
+                                             rendered="#{not arecs.updateValues.opex_categ_cod.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['recs.col.antet.text']}" for="txt_antet"/>
+                </p:column>
+                <p:column>
+                    <p:inputTextarea id="txt_antet" value="#{arecs.updateValues.text_antet.value}" cols="30" rows="3" maxlength="1000"
+                                     validatorMessage="#{uimess['recs.col.antet.text']}: #{uimess['valid.1to1000chars']}">
+                        <f:validateLength minimum="1" maximum="1000"/>
+                    </p:inputTextarea>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="txt_antet_empty" value="#{arecs.updateValues.text_antet.goleste}"
+                                             rendered="#{not arecs.updateValues.text_antet.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['recs.col.doc.nume']}" for="txt_nume"/>
+                </p:column>
+                <p:column>
+                    <p:inputTextarea id="txt_nume" value="#{arecs.updateValues.text_nume.value}" cols="30" rows="3" maxlength="4000"
+                                     validatorMessage="#{uimess['recs.col.doc.nume']}: #{uimess['valid.1to4000chars']}">
+                        <f:validateLength minimum="1" maximum="4000"/>
+                    </p:inputTextarea>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="txt_nume_empty" value="#{arecs.updateValues.text_nume.goleste}"
+                                             rendered="#{not arecs.updateValues.text_nume.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['recs.col.obj.part']}" for="objpart_cod"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="objpart_cod" value="#{arecs.updateValues.obj_part_cod.value}" size="30" maxlength="30"
+                                 validatorMessage="#{uimess['recs.col.obj.part']}: #{uimess['valid.9to30capitdigitordot']}">
+                        <f:validateLength minimum="9" maximum="30"/>
+                        <f:validateRegex pattern="[0-9A-Z.]+"/>
+                    </p:inputText>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="pbjpart_cod_empty" value="#{arecs.updateValues.obj_part_cod.goleste}"
+                                             rendered="#{not arecs.updateValues.obj_part_cod.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['recs.col.obj.part.nume']}" for="objpart_nume"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="objpart_nume" value="#{arecs.updateValues.obj_part_nume.value}" size="30" maxlength="50"
+                                 validatorMessage="#{uimess['recs.col.obj.part.nume']}: #{uimess['valid.1to50chars']}">
+                        <f:validateLength minimum="1" maximum="50"/>
+                    </p:inputText>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="objpart_nume_empty" value="#{arecs.updateValues.obj_part_nume.goleste}"
+                                             rendered="#{not arecs.updateValues.obj_part_nume.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>
+                    <p:outputLabel value="#{uimess['recs.col.ic.part']}" for="icpart_cod"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="icpart_cod" value="#{arecs.updateValues.part_ic.value}" size="5" maxlength="5"
+                                 validatorMessage="#{uimess['recs.col.ic.part']}: #{uimess['valid.1to5digits']}">
+                        <f:validateLength minimum="1" maximum="5"/>
+                        <f:validateRegex pattern="[0-9]+"/>
+                    </p:inputText>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="icpart_cod_empty" value="#{arecs.updateValues.part_ic.goleste}"
+                                             rendered="#{not arecs.updateValues.part_ic.obligatoriu}"/>
+                </p:column>
+            </p:row>
+
+            <f:facet name="footer">
+                <p:row>
+                    <p:column colspan="3">
+                        <p:commandButton id="update-sel" widgetVar="dialog-update-sel" value="#{uimess['recs.submit.upd.sel.value']}" icon="fa fa-pencil"
+                                         action="#{arecs.updateSelected()}" update='panel' rendered='#{not empty arecs.selected}'
+                                         onstart="disable();" oncomplete="enable();"/>
+                        <p:commandButton id="update-flt" widgetVar="dialog-update-flt" value="#{uimess['recs.submit.upd.flt.value']}" icon="fa fa-pencil"
+                                         action="#{arecs.updateByFilter()}" update='panel' onstart="disable();" oncomplete="enable();"/>
+                    </p:column>
+                </p:row>
+            </f:facet>
+        </p:panelGrid>    
+        <script>
+            function disable(){
+                if (jQuery('#fdlg\\:update-sel').length > 0) PF('dialog-update-sel').disable();
+                PF('dialog-update-flt').disable();
+                jQuery('#fdlg\\:progress').show();
+            }
+
+            function enable(){
+                if (jQuery('#fdlg\\:update-sel').length > 0) PF('dialog-update-sel').enable();
+                PF('dialog-update-flt').enable();
+                jQuery('#fdlg\\:progress').fadeOut(800);
+            }
+        </script>
+    </c:if>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

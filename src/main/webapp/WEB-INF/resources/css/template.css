@@ -1,0 +1,132 @@
+:root{
+    --main-bg-color: #edf0f5;
+    --font-size: 14px;
+}
+
+html, body{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    font-family: "latoregular", "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: var(--font-size);
+    background-color: var(--main-bg-color);
+}
+
+.app-layout{
+    box-sizing: border-box;
+    width: 100%;
+}
+
+#topbar{
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+#app-header{
+    box-sizing: border-box;
+    background-color: #1ea2b1;
+    padding: 0.25rem 0.5rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+#app-header > table{
+    border-collapse: collapse;
+    height: 2rem;
+    vertical-align: middle;
+}
+
+#app-header .header-right{
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #1ea2b1;
+    padding: 0.25rem 0.5rem 0.25rem 0.2rem;
+}
+
+#app-header .header-right > table {
+    border-collapse: collapse;
+    height: 2rem;
+    vertical-align: middle;
+}
+
+#menu-button{
+    font-size: 2rem;
+    color: #ffffff;
+}
+
+#menu-button:hover{
+    color: #cccccc;
+}
+
+#app-main{
+    box-sizing: border-box;
+    margin-top: 3rem;
+}
+
+#app-main > table {
+    border-collapse: collapse;
+    vertical-align: top;
+}
+
+#app-main > table > tr > td,
+#app-main > table > tbody > tr > td {
+    vertical-align: top;
+}
+
+#sidenav {
+    box-sizing: border-box;
+    width: 9rem;
+}
+
+#app-content {
+    box-sizing: border-box;
+    padding: 0 0.5rem;
+}
+
+@media only screen and (max-width: 768px){
+    #sidenav{
+        display: none;
+        position: fixed;
+        top: 3rem;
+        left: 0;
+        width: 10rem;
+        height: calc(100% - 3rem);
+        background-color: #30383c;
+        padding: 0.5rem;
+        z-index: 4;
+        overflow: auto;
+    }
+}
+
+.ui-widget{
+    font-size: var(--font-size);
+}
+
+.ui-growl-item-container{
+    opacity: 1 !important;
+}
+
+.ui-growl-icon-close{
+    display: block !important;
+}
+
+.ui-growl-message{
+    white-space: pre-line;
+}
+
+.ui-dialog-titlebar{
+    margin: 0 !important;
+}
+
+input[readonly="readonly"]{
+    background-color: #dddddd !important;
+}

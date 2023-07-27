@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['bline.asg.nosel']}" rendered="#{empty bussasg.selected}"/>
+    <p:staticMessage severity='warn' detail="#{bussasg.initError}" rendered="#{not empty bussasg.initError}"/>
+    <p:panelGrid id='panel' rendered="#{not empty bussasg.selected and empty bussasg.initError}">
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.arie']}" for="arie"/>
+            </p:column>
+            <p:column>
+                <h:outputText id='arie' value="#{bussasg.selected.coarea} #{bussasg.selected.coarea_nume}"/> 
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.line']}" for="linie"/>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu id="linie" value="#{bussasg.selected.buss_line}" filter='true' filterMatchMode="contains"
+                                 validatorMessage="#{uimess['col.line']}: #{uimess['mess.required']}">
+                    <f:validateRequired/>
+                    <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                    <f:selectItems value="#{bussasg.notAsigned}" var="linie" itemLabel="#{linie.cod} #{linie.segment} #{linie.nume}" itemValue="#{linie.cod}"/>
+                </p:selectOneMenu>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save" action="#{bussasg.save()}" update="panel"
+                                     onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                                     oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

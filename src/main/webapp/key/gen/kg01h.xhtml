@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['keys.gen.title']} (G01)</ui:define>
+    <ui:define name="page-title">#{uimess['keys.gen.title']} (G01)</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{kg01hlist.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+
+        <c:if test="#{not empty kg01hlist.initError}">
+            <p:staticMessage severity="warn" detail="#{kg01hlist.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+            
+        <c:if test="#{empty kg01hlist.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id='panel'>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.dset']}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{kg01hlist.dataset.id} #{kg01hlist.dataset.nume} - #{kg01hlist.dataset.vers} #{kg01hlist.dataset.an}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.coarea']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{kg01hlist.coarea.cod} #{kg01hlist.coarea.nume}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-add" title="#{uimess['keys.gen.btn.add.title']}" value="#{uimess['mess.add']}" icon='fa fa-plus'
+                                action="#{kg01hlist.newItem()}" update='fdlg:dialog' process="@this" partialSubmit="true"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/cheie_g01_def_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['keys.gen.btn.add.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{kg01h.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-change" title="#{uimess['keys.gen.btn.chg.title']}" value="#{uimess['mess.chg']}" icon='fa fa-pencil'
+                                action="#{kg01hlist.passSelected(true)}" update='fdlg:dialog'
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/cheie_g01_def_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['keys.gen.btn.chg.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{kg01h.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-delete" title="#{uimess['keys.s01.btn.del.title']}" value="#{uimess['mess.del']}" icon='fa fa-trash'
+                                action="#{kg01hlist.passSelected(false)}" update='fdlg:dialog'
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/cheie_g01_def_delete.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['keys.s01.btn.del.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{kg01h.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-valori" title="#{uimess['keys.gen.btn.vals.title']}" value="#{uimess['col.valori']}" icon="fa fa-dollar"
+                                action="#{kg01hlist.navigate('kg01v')}" ajax="false"/>
+
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                    <p:menuitem id="menu-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                    url="javascript:void(0)" onclick="PF('block').show(); PF('tabela').clearFilters();"/>                       
+                    <p:menuitem id="menu-download" title="#{uimess['mess.xlsx.dwn.title']}" value="XLSX" icon="fa fa-download" ajax="false"
+                                action="#{kg01hlist.export()}" onclick='PrimeFaces.monitorDownload(downloadStart, downloadEnd);'/>
+                </p:menubar>
+
+                <p:dataTable id="tabela" widgetVar="tabela" value="#{kg01hlist.list}" var="item" expandableRowGroups="true"
+                             sortBy="#{item.blocat ? uimess['col.blocate'] : uimess['col.utilizabile']}" sortOrder="descending" filteredValue="#{kg01hlist.filtered}"
+                             selectionMode="single" selection="#{kg01hlist.selected}" rowKey="#{item.id}">
+                    <p:ajax event="filter" ignoreAutoUpdate="true" oncomplete="tableEndUpdate();" />
+
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="Id" filterBy="#{item.id}" filterMatchMode="contains"
+                                      filterValue="#{kg01hlist.filterValues[0]}" filterMaxLength="8" filterStyle="width: 6em;"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.nume']}" filterBy="#{item.nume}" filterMatchMode="contains"
+                                      filterValue="#{kg01hlist.filterValues[1]}" filterMaxLength="30"/>
+                            <p:column colspan="#{kg01hlist.dataset_ani.size()}" headerText="Valori"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.user.short']}(def)" filterBy="#{item.mod_de}" filterMatchMode="contains"
+                                      filterValue="#{kg01hlist.filterValues[2]}" filterMaxLength="20" filterStyle="width: 6em;"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.time.short']}(def)"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.user.short']}(val)" filterBy="#{item.valori[0].mod_de}" filterMatchMode="contains"
+                                      filterValue="#{kg01hlist.filterValues[3]}" filterMaxLength="20" filterStyle="width: 6em;"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.time.short']}(val)"/>
+                        </p:row>
+                        <p:row>
+                            <c:forEach items="#{kg01hlist.dataset_ani}" var="an">
+                                <p:column headerText="#{an}"/>
+                            </c:forEach>
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:headerRow>
+                        <p:column colspan="#{kg01hlist.dataset_ani.size() + 6}">
+                            <h:outputText value="#{item.blocat ? uimess['col.blocate'] : uimess['col.utilizabile']}"/>
+                        </p:column>
+                    </p:headerRow>
+
+                    <p:column>
+                        <h:outputText value="#{item.id}"/>
+                    </p:column>
+
+                    <p:column>
+                        <h:outputText value="#{item.nume}"/>
+                    </p:column>
+
+                    <c:forEach items="#{kg01hlist.dataset_ani}" var="an">
+                        <p:column style="text-align: right;">
+                            <h:outputText value="#{kg01hlist.getTotalByCheiAndAn(item.valori, an)}" rendered="#{not empty item.valori}">
+                                <f:convertNumber pattern="#,###"/>
+                            </h:outputText>
+                        </p:column>
+                    </c:forEach>
+
+                    <p:column style="text-align: right;">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column style="text-align: right;">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column style="text-align: right;">
+                        <h:outputText value="#{item.valori[0].mod_de}"/>
+                    </p:column>
+
+                    <p:column style="text-align: right;">
+                        <h:outputText value="#{item.valori[0].mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:contextMenu for='tabela' selectionMode="single">
+                    <p:menuitem id="cntx-change" value="#{uimess['mess.chg']}" icon="fa fa-pencil" url="javascript:void(0)" onclick="jQuery('#list\\:menu-change').click();"/>
+                    <p:menuitem id="cntx-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete').click();"/>                        
+                    <p:menuitem id="cntx-valori" value="#{uimess['col.valori']}" icon="fa fa-dollar" url="javascript:void(0)" onclick="jQuery('#list\\:menu-valori').click();"/>                        
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+            
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true"
+                            fitViewport="true" blockScroll="true"
+                            closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+            
+            <h:form id="funct">
+                <p:remoteCommand id="init" name='init' action="#{kg01hlist.datainit()}" update="list:tabela"
+                                process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>
+                
+                <p:remoteCommand id="update" name='update' update="list:tabela"
+                                process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>
+                
+                <p:remoteCommand id="clear" name='clear' action="#{kg01hlist.clear()}" update="fdlg:dialog"
+                                process="@this" partialSubmit="true" ignoreAutoUpdate="true"/>
+                
+            </h:form>
+            
+            <script>
+                /* <![CDATA[ */
+                function downloadStart(){
+                    PF('block').show();
+                }
+                
+                function downloadEnd(){
+                    PF('block').hide();
+                }
+                
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+                
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:define name='metadata'>
+        <f:metadata>
+            <f:viewAction action="#{usersession.init()}"/>
+        </f:metadata>
+    </ui:define>
+    <ui:define name="browser-title">#{uimess['usess.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['usess.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <c:if test="#{not empty usersession.initError}">
+            <p:staticMessage severity="warn" detail="#{usersession.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty usersession.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+
+            <h:form id="list">
+                <p:menubar style="margin-bottom: 2px">
+                    <p:menuitem id="menu-download" title="#{uimess['mess.xlsx.dwn.title']}" value="XLSX" icon="fa fa-download" ajax="false">
+                        <p:dataExporter type='xlsx' target="tabela" fileName="raport"/>
+                    </p:menuitem>
+                </p:menubar>
+
+                <p:dataTable id="tabela" value="#{usersession.list}" var="item" sortBy="#{item.mod_timp}" sortOrder="descending"
+                             rowKey="#{item.uname}" reflow="true">
+                    <f:facet name="header">
+                        <h:outputText value="#{uimess['usess.tbl.head']}" style="font-weight: normal;"/>
+                    </f:facet>
+
+                    <p:column headerText="#{uimess['col.kid']}">
+                        <h:outputText value="#{item.uname.toUpperCase(portal_lang.locale)}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.prenume']}">
+                        <h:outputText value="#{item.prenume}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.nume']}">
+                        <h:outputText value="#{item.nume}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.email']}">
+                        <h:outputText value="#{item.email}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.lauth']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

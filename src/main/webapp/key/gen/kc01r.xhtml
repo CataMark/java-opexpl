@@ -1,0 +1,247 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['keys.gen.title']} (C01)</ui:define>
+    <ui:define name="page-title">#{uimess['keys.gen.title']} (C01)</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{kc01r.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" action="#{kc01r.navigate('kc01h')}"/>
+                <p:menuitem value="#{uimess['mess.rule']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty kc01r.initError}">
+            <p:staticMessage severity="warn" detail="#{kc01r.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty kc01r.initError}">
+            <style>
+                #data\:panel > .ui-panelgrid-header{
+                    text-align: left;
+                }
+                
+                #data\:panel > .ui-widget-content:not(:first-child){
+                    border-top: none;
+                }
+                
+                #data\:panel .ui-panelgrid-cell{
+                    width: auto;
+                }
+                
+                #data\:panel .ui-panelgrid-cell > .ui-panel{
+                    border: none;
+                }
+                
+                #data\:panel .ui-panelgrid-cell > .ui-panel > .ui-panel-titlebar{
+                   border-width: 1px;
+                }
+                
+                #data\:panel .ui-panelgrid-cell > .ui-panel > .ui-panel-content{
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+                
+                #data\:panel .ui-picklist ul{
+                    width: auto;
+                    min-width: 200px;
+                    height: 350px;
+                }
+                
+                #data\:panel .ui-picklist li{
+                    white-space: nowrap;
+                }
+                
+                #data\:panel .ui-tree{
+                    width: auto;
+                    height: 400px;
+                    overflow-y: scroll;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id='panel'>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.dset']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{kc01r.dataset.id} #{kc01r.dataset.nume} - #{kc01r.dataset.vers} #{kc01r.dataset.an}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.coarea']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{kc01r.coarea.cod} #{kc01r.coarea.nume}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.cheie']}:"/>
+                        </p:column>
+                        <p:column style="#{kc01r.cheie.blocat ? 'text-decoration: line-through;' : ''}">
+                            <h:outputText value="#{kc01r.cheie.id} #{kc01r.cheie.nume}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='data'>
+                <p:menubar style="margin-bottom: 2px; border-color: #B00402;">
+                    <p:menuitem id="menu-check" title="#{uimess['keys.c01.btn.rule.chk.title']}"
+                                value="#{uimess['mess.chk']}" icon="fa fa-question" action="#{kc01r.checkValsExist()}"
+                                onstart="PF('block').show();" oncomplete="PF('block').hide();"/>
+                    <p:menuitem id="menu-save" value="#{uimess['mess.save']}" icon="fa fa-save" action="#{kc01r.save()}" update="panel"
+                                onstart="PF('block').show();" oncomplete="PF('block').hide();"/>
+                    <p:menuitem id="menu-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" action="#{kc01r.delete()}" update="panel"
+                                onstart="PF('block').show();" oncomplete="PF('block').hide();"/>
+                    <p:menuitem id="menu-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" oncomplete="init();"/>
+                </p:menubar>
+
+                <p:panelGrid id="panel" layout="grid" columns="2">
+                    <f:facet name="header">
+                        <h:outputText value="#{uimess['keys.c01.btn.rule.info']}" style="font-weight: bold;"/>
+                        <br/><br/>
+                        <p:panelGrid id="panel-top">
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column>
+                                        <p:outputLabel value="#{uimess['col.medie.pond']}" style="white-space: pre-line;"/>
+                                    </p:column>
+                                    <p:column>
+                                        <p:outputLabel value="#{uimess['col.null.partner']}" style="white-space: pre-line;"/>
+                                    </p:column>
+                                    <p:column>
+                                        <p:outputLabel value="#{uimess['col.user']}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <p:outputLabel value="#{uimess['col.time']}"/>
+                                    </p:column>
+                                </p:row>
+                            </f:facet>
+
+                            <p:row>
+                                <p:column>
+                                    <p:selectBooleanCheckbox value="#{kc01r.rule.medie_pond}"/>
+                                </p:column>
+                                <p:column>
+                                    <p:selectBooleanCheckbox value="#{kc01r.nulPartner}"/>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{kc01r.rule.mod_de}"/>
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{kc01r.rule.mod_timp}">
+                                        <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+                        </p:panelGrid>
+                    </f:facet>
+
+                    <p:panel header="#{uimess['col.chei']}" toggleable="true">
+                        <p:pickList id="chei" value="#{kc01r.cheiPick}" var="item"
+                                    itemValue="#{item}" itemLabel="#{item.tip} #{item.id} #{item.nume}"
+                                    filterMatchMode="contains" showSourceFilter="true" showTargetFilter="true"
+                                    converter="keyHeadPickListConverter">
+
+                            <f:facet name="sourceCaption">#{uimess['col.disponibile']}</f:facet>
+                            <f:facet name="targetCaption">#{uimess['col.asignate']}</f:facet>
+
+                            <p:column>
+                                <h:outputText value="#{item.tip} #{item.id} #{item.nume}"
+                                              style="#{item.blocat ? 'text-decoration: line-through;' : ''}"/>
+                            </p:column>
+                        </p:pickList>
+                    </p:panel>
+
+                    <p:panel header="#{uimess['col.ccenters']}" toggleable="true">
+                        <p:tree value="#{kc01r.hier}" var="item" selectionMode="checkbox" selection="#{kc01r.selCCenters}"
+                                filterBy="#{item.cod} #{item.nume}" filterMatchMode="contains">
+
+                            <p:treeNode>
+                                <h:outputText value="#{item.cod} #{item.nume}"
+                                              style="#{not item.leaf ? 'font-weight: bold;' : ''}
+                                            #{item.blocat ? 'text-decoration: line-through;':''}"/>
+                            </p:treeNode>
+                        </p:tree>
+                    </p:panel>
+
+                    <p:panel header="#{uimess['col.categs']}" toggleable="true">
+                        <p:tree value="#{kc01r.categs}" var="item" selectionMode="checkbox" selection="#{kc01r.selCategs}"
+                                filterBy="#{item.cod} #{item.nume}" filterMatchMode="contains">
+
+                            <p:treeNode>
+                                <h:outputText value="#{item.cod} #{item.nume}"
+                                              style="font-weight: bold; #{item.blocat ? 'text-decoration: line-through;':''}"/>
+                            </p:treeNode>
+                            <p:treeNode type="categ">
+                                <h:outputText value="#{item.cod} #{item.nume}"
+                                              style="#{item.blocat ? 'text-decoration: line-through;':''}"/>
+                            </p:treeNode>
+                        </p:tree>
+                    </p:panel>
+
+                    <p:panel header="#{uimess['col.parteneri']}" toggleable="true">
+                        <p:pickList id="parteneri" value="#{kc01r.partnPick}" var="item"
+                                    itemValue="#{item}" itemLabel="#{item.cod} #{item.nume}"
+                                    filterMatchMode="contains" showSourceFilter="true" showTargetFilter="true"
+                                    converter="icPartenerPickListConverter">
+
+                            <f:facet name="sourceCaption">#{uimess['col.disponibile']}</f:facet>
+                            <f:facet name="targetCaption">#{uimess['col.asignate']}</f:facet>
+
+                            <p:column>
+                                <h:outputText value="#{item.cod} #{item.nume}"/>
+                            </p:column>
+                        </p:pickList>
+                    </p:panel>
+
+                </p:panelGrid>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+            
+            <h:form id="funct">
+                <p:remoteCommand id="init" name='init' action="#{kc01r.datainit(true)}" update='data:panel'
+                                process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                onstart="PF('block').show();" oncomplete="PF('block').hide();"/>            
+            </h:form>            
+            <script>
+                /* <![CDATA[ */                
+                jQuery(document).ready(function() {
+                    init();
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

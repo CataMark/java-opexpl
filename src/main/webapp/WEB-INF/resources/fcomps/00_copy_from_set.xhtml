@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{copyfromdset.nokMessage}" rendered="#{not copyfromdset.okFlag}"/>
+    <p:panelGrid id='panel' rendered="#{copyfromdset.okFlag}">        
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.an']}" for="an"/>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu id="an" value="#{copyfromdset.an}">
+                    <p:ajax event="change" update="set" listener="#{copyfromdset.clearSeturi()}"
+                            onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                             oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);">
+                        <p:resetInput target="set"/>
+                    </p:ajax>
+                    <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                    <f:selectItems value="#{copyfromdset.ani}" var="item" itemLabel="#{item.toString()}" itemValue="#{item}"/>
+                </p:selectOneMenu>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.dset']}" for="set"/>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu id="set" value="#{copyfromdset.from_set}"
+                                 validatorMessage="#{uimess['col.dset']}: #{uimess['mess.required']}">
+                    <f:validateRequired/>
+                    <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                    <f:selectItems value="#{copyfromdset.seturi}" var="item" itemLabel="#{item.id} #{item.nume} - #{item.vers}" itemValue="#{item.id}"/>
+                </p:selectOneMenu>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['col.copy']}" icon="fa fa-copy" action="#{copyfromdset.execute()}" update="panel"
+                                     onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                                     oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['raps.ccenter.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['raps.ccenter.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <c:if test="#{not empty ccrapprompt.initError}">
+            <p:staticMessage severity="warn" detail="#{ccrapprompt.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty ccrapprompt.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #prompt{
+                    display: inline-block;
+                }
+                
+                #prompt\:panel .ui-widget-content:not(:last-child){
+                    border-bottom: none;
+                }
+                
+                #prompt\:panel .ui-widget-content:not(:first-child){
+                    border-top: none;
+                }
+                
+                #prompt\:panel .ui-panelgrid-cell{
+                    border: none;
+                }
+            </style>
+
+            <h:form id="prompt">
+                <p:panelGrid id="panel">
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2" style="text-align: left;">
+                                <p:commandButton ajax="false" id="submit-sumar" widgetVar="submit-sumar" value="#{uimess['plan.sumar']}" icon="fa fa-chevron-right" action="#{ccrapprompt.navigate('sumar')}" tabindex="1"/>
+                                <p:commandButton ajax="false" id="submit-pozitii" widgetVar="submit-pozitii" value="#{uimess['plan.pozitii']}" icon="fa fa-chevron-right" action="#{ccrapprompt.navigate('pozitii')}" tabindex="2"/>
+                                <p:commandButton ajax="false" id="submit-compar" widgetVar="submit-compar" value="#{uimess['plan.comparatie']}" icon="fa fa-chevron-right" action="#{ccrapprompt.navigate('compar')}" tabindex="3"/>
+                                <p:commandButton ajax="false" id="submit-alocare" widgetVar="submit-alocare" value="#{uimess['plan.alocare']}" icon="fa fa-chevron-right" action="#{ccrapprompt.navigate('alocare')}" tabindex="4"/>
+                                <p:defaultCommand target="submit-sumar"/>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                    
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:messages closable="true"/>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.dset']}" for="dataset"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="dataset" value="#{ccrapprompt.set_sel}" tabindex="5" filter="true" filterMatchMode="contains"
+                                             validatorMessage="#{uimess['col.dset']}: #{uimess['mess.required']}">
+                                <p:ajax event="change" listener="#{ccrapprompt.onChange()}" update="chier" onstart="disable();" oncomplete="enable();"/>
+                                
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{ccrapprompt.seturi}" var="item"
+                                               itemLabel="#{item.id} #{item.nume} - #{item.vers} #{item.an}" itemValue="#{item.id}"/>
+                                <f:validateRequired/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.coarea']}" for="coarea"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="coarea" value="#{ccrapprompt.arie_sel}" tabindex="6" filter="true" filterMatchMode="contains"
+                                             validatorMessage="#{uimess['col.coarea']}: #{uimess['mess.required']}">
+                                <p:ajax event="change" listener="#{ccrapprompt.onChange()}" update="chier" onstart="disable();" oncomplete="enable();"/>
+                                
+                                <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                                <f:selectItems value="#{ccrapprompt.arii}" var="item" itemLabel="#{item.cod} #{item.nume}" itemValue="#{item.hier}"/>
+                                <f:validateRequired/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel value="#{uimess['col.ccenter']}" for="chier"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:tree id='chier' style="width:auto;"
+                                    value='#{ccrapprompt.hier}' required="true" var='item' selectionMode="single" selection="#{ccrapprompt.hier_sel}"
+                                    filterBy="#{item.cod} #{item.nume}" filterMatchMode="contains" tabindex="7"
+                                    requiredMessage="#{uimess['col.ccenter']}: #{uimess['mess.required']}">
+                                
+                                <p:treeNode>
+                                    <h:outputText value="#{item.cod} #{item.nume}"
+                                        style="#{not item.leaf ? 'font-weight: bold;':''}#{item.blocat ? 'text-decoration: line-through;':''}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+        
+            <script>
+                /* <![CDATA[ */
+                function disable(){
+                    PF('submit-sumar').disable();
+                    PF('submit-pozitii').disable();
+                    PF('submit-compar').disable();
+                    PF('submit-alocare').disable();
+                    jQuery('#progress-bar').show();
+                }
+
+                function enable(){
+                    PF('submit-sumar').enable();
+                    PF('submit-pozitii').enable();
+                    PF('submit-compar').enable();
+                    PF('submit-alocare').enable();
+                    jQuery('#progress-bar').fadeOut(800);
+                }
+
+                jQuery(document).ready(function() {
+                        jQuery('#prompt\\:panel').stickyTableHeaders();
+                        jQuery("#progress-bar").fadeOut(800);
+                        PF('growl').renderMessage({"summary":"#{uimess['plan.ccenter.prompt.growl.title']}",
+                                                "detail":"#{uimess['raps.ccenter.prompt.growl.detail']}",
+                                                "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

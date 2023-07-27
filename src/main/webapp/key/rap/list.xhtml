@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['keys.rap.nval.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['keys.rap.nval.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+    
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{keyasgnoval.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty keyasgnoval.initError}">
+            <p:staticMessage severity="warn" detail="#{keyasgnoval.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty keyasgnoval.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id='panel'>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.dset']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{keyasgnoval.dataset.id} #{keyasgnoval.dataset.nume} - #{keyasgnoval.dataset.vers} #{keyasgnoval.dataset.an}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.coarea']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{keyasgnoval.coarea.cod} #{keyasgnoval.coarea.nume}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">                        
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                    <p:menuitem id="menu-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                    url="javascript:void(0)" onclick="PF('block').show(); PF('tabela').clearFilters();"/>
+
+                    <p:menuitem id="menu-download" title="#{uimess['mess.xlsx.dwn.title']}" value="XLSX" icon="fa fa-download" ajax="false">
+                        <p:dataExporter type='xlsx' target="tabela" fileName="raport"/>
+                    </p:menuitem>
+                </p:menubar>
+
+                <p:dataTable id="tabela" widgetVar="tabela" value="#{keyasgnoval.list}" var="item" expandableRowGroups="true"
+                             filteredValue="#{keyasgnoval.filtered}" sortBy="#{item.cost_center} #{item.cost_center_nume}">
+                    <p:ajax event="filter" ignoreAutoUpdate="true" oncomplete="tableEndUpdate();" />
+
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="#{uimess['col.tip']}" filterBy="#{item.tip}" filterMatchMode="contains"
+                                      filterValue="#{keyasgnoval.filterValues[0]}" filterMaxLength="3" filterStyle="width: 3em;"/>
+                            <p:column rowspan="2" headerText="Id" filterBy="#{item.id}" filterMatchMode="contains"
+                                      filterValue="#{keyasgnoval.filterValues[1]}" filterMaxLength="8" filterStyle="width: 6em;"/>
+                            <p:column rowspan="2" headerText="#{uimess['col.nume']}" filterBy="#{item.nume}" filterMatchMode="contains"
+                                      filterValue="#{keyasgnoval.filterValues[2]}" filterMaxLength="30"/>
+                            <p:column colspan="#{keyasgnoval.dataset_ani.size()}" headerText="#{uimess['col.noval']}"/>
+                        </p:row>
+                        <p:row>
+                            <c:forEach items="#{keyasgnoval.dataset_ani}" var="an">
+                                <p:column headerText="#{an}"/>
+                            </c:forEach>
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:headerRow>
+                        <p:column colspan="#{keyasgnoval.dataset_ani.size() + 3}">
+                            <h:outputText value="#{item.cost_center} #{item.cost_center_nume}"/>
+                        </p:column>
+                    </p:headerRow>
+
+                    <p:column>
+                        <h:outputText value="#{item.tip}"/>
+                    </p:column>
+
+                    <p:column style="#{item.blocat ? 'text-decoration: line-through;' : ''}">
+                        <h:outputText value="#{item.id}"/>
+                    </p:column>
+
+                    <p:column style="#{item.blocat ? 'text-decoration: line-through;' : ''}">
+                        <h:outputText value="#{item.nume}"/>
+                    </p:column>
+
+                    <c:forEach items="#{keyasgnoval.dataset_ani}" var="an">
+                        <p:column style="text-align: center;" exportFunction="#{keyasgnoval.exportFunction(keyasgnoval.getFlagByCheiAndAn(item.valori, an))}">
+                            <span class="#{keyasgnoval.getFlagByCheiAndAn(item.valori, an) ? 'fa fa-times' : ''}"></span>
+                        </p:column>
+                    </c:forEach>
+                </p:dataTable>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+            
+            <h:form>
+                <p:remoteCommand id="init" name='init' action="#{keyasgnoval.datainit()}" update='list:tabela'
+                                process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>
+                
+                <p:remoteCommand id="update" name='update' update="list:tabela"
+                                process="@this" partialSubmit="true" ignoreAutoUpdate="true"
+                                onstart="PF('block').show();" oncomplete="PF('tabela').filter();"/>             
+            </h:form>
+            
+            <script>
+                /* <![CDATA[ */
+                function tableEndUpdate(){
+                    PF('block').hide();
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+
+</ui:composition>

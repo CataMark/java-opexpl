@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['month.nosel']}" rendered="#{empty month.selected}"/>
+    <p:panelGrid id='panel' rendered="#{not empty month.selected}">
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.cod']}" for="cod"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="cod" value="#{month.selected.cod}" size="2" maxlength="2"
+                            readonly="#{not empty month.selected.mod_timp}"
+                            validatorMessage="#{uimess['col.cod']}: #{uimess['valid.2capitornumb']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="2" maximum="2"/>
+                    <f:validateRegex pattern="[0-9A-Z]+"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.nume']}" for="nume"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="nume" value="#{month.selected.nume}" size="30" maxlength="50"
+                             validatorMessage="#{uimess['col.nume']}: #{uimess['valid.1to50chars']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="1" maximum="50"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save" action="#{month.save()}" update="panel"                             
+                             onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                             oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

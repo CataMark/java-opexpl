@@ -1,0 +1,339 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions">
+
+   <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['recs.actual.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['recs.actual.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{arecs.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['mess.lista']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty arecs.initError}">
+            <p:staticMessage severity="warn" detail="#{arecs.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty arecs.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id='panel'>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <h:outputText value="#{uimess['col.dset']}:"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{arecs.dataset.id} #{arecs.dataset.nume} - #{arecs.dataset.vers} #{arecs.dataset.an}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="font-weight: bold;">
+                            <h:outputText value="#{uimess['col.coarea']}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{arecs.coarea.cod} #{arecs.coarea.nume}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:submenu label="#{uimess['upload.btn.load']}" icon="fa fa-upload">
+                        <p:menuitem id="menu-load-templ" title="#{uimess['upload.menu.load.templ.title']}" value="#{uimess['upload.menu.load.templ.value']}" icon="fa fa-table"
+                            update="fdlg:dialog"
+                            onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/recs_actual_load_templ.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.templ.dialog']}" target="#{dialog.title}"/>
+                        </p:menuitem>
+                        <p:menuitem id="menu-load-text" title="#{uimess['upload.menu.load.text.title']}" value="#{uimess['upload.menu.load.text.value']}" icon="fa fa-paste"
+                            update="fdlg:dialog"
+                            onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                            <f:setPropertyActionListener value="oxpl.tbl_int_recs_act" target="#{dbload.tabela}"/>
+                            <f:setPropertyActionListener value='["data_set","coarea"]' target="#{dbload.colNames}"/>
+                            <f:setPropertyActionListener value='["#{arecs.dataset.id}","#{arecs.coarea.cod}"]' target="#{dbload.colValues}"/>
+
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_text.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.text.dialog']}" target="#{dialog.title}"/>
+                            <f:setPropertyActionListener value="PF('dialog').hide(); init();" target="#{dbload.finishScript}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+                        <p:menuitem id="menu-load-file" title="#{uimess['upload.menu.load.file.title']}" value="#{uimess['upload.menu.load.file.value']}" icon="fa fa-file"
+                            update="fdlg:dialog"
+                            onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                            <f:setPropertyActionListener value="oxpl.tbl_int_recs_act" target="#{dbload.tabela}"/>
+                            <f:setPropertyActionListener value="#{20*1024*1024}" target="#{dbload.maxFileSize}"/>
+                            <f:setPropertyActionListener value='["data_set","coarea"]' target="#{dbload.colNames}"/>
+                            <f:setPropertyActionListener value='["#{arecs.dataset.id}","#{arecs.coarea.cod}"]' target="#{dbload.colValues}"/>
+
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/upload_file.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['upload.menu.load.file.dialog']}" target="#{dialog.title}"/>
+                            <f:setPropertyActionListener value="PF('dialog').hide(); init();" target="#{dbload.finishScript}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>                                   
+                    </p:submenu>
+
+                    <p:menuitem id="menu-change" title="#{uimess['recs.actual.btn.chg.title']}" value="#{uimess['mess.chg']}" icon="fa fa-pencil"
+                                    update="fdlg:dialog"
+                                    onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/recs_actual_update.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['recs.actual.btn.chg.title']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); init();" target="#{arecs.finishScript}"/>
+                        <f:setPropertyActionListener value="#{arecs.newUpdateValues()}" target="#{arecs.updateValues}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:submenu label="#{uimess['mess.del']}" icon="fa fa-trash">
+                        <p:menuitem id="menu-delete-sel" title="#{uimess['recs.actual.btn.del.sel.title']}" value="#{uimess['recs.actual.btn.del.sel.value']}" icon="fa fa-trash"
+                                        update="fdlg:dialog"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/recs_actual_delete_selected.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['recs.actual.btn.del.sel.title']}" target="#{dialog.title}"/>
+                            <f:setPropertyActionListener value="PF('dialog').hide(); init();" target="#{arecs.finishScript}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+
+                        <p:menuitem id="menu-delete-flt" title="#{uimess['recs.actual.btn.del.flt.title']}" value="#{uimess['recs.actual.btn.del.flt.value']}" icon="fa fa-trash"
+                                        update="fdlg:dialog"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                             <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/recs_actual_delete_filtered.xhtml" target="#{dialog.address}"/>
+                             <f:setPropertyActionListener value="#{uimess['recs.actual.btn.del.flt.title']}" target="#{dialog.title}"/>
+                             <f:setPropertyActionListener value="PF('dialog').hide(); init();" target="#{arecs.finishScript}"/>
+                             <p:resetInput target="fdlg:dialog"/>
+                         </p:menuitem>
+                    </p:submenu>
+
+                    <p:menuitem id="list_btn_dwn" title="#{uimess['mess.xlsx.dwn.title']}" value="XLSX" icon="fa fa-download" ajax="false"
+                                action="#{arecs.export()}" onclick='PrimeFaces.monitorDownload(downloadStart, downloadEnd);'/>
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+                    <p:menuitem id="menu-reset" title="#{uimess['mess.reset.title']}" value="#{uimess['mess.reset']}" icon="fa fa-filter"
+                                url="javascript:void(0)" onclick="PF('block').show(); PF('tabela').clearFilters();"/>
+
+                    <p:menuitem id="menu-info" value="Info" icon="fa fa-info"
+                                update="fdlg:dialog"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/lazy_records_info_#{portal_lang.language}.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['recs.actual.btn.info.dialog']}" target="#{dialog.title}"/>
+                    </p:menuitem>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{arecs.list}' var='item'
+                             selection="#{arecs.selected}"
+                             lazy='true' sortMode="multiple" filterEvent="enter"
+                             paginator='true' rows="20"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                             rowsPerPageTemplate="20,50,100">
+
+                    <p:ajax event='filter' onstart="PF('block').show();" oncomplete="refreshfooter(); PF('block').hide();" ignoreAutoUpdate="true"/>
+
+                    <p:column selectionMode="multiple" exportable="false"/>
+
+                    <p:column headerText="#{uimess['col.an']}" sortBy="#{item.get('an')}"
+                              filterBy="#{item.get('an')}" field="q.an" filterMaxLength="4" filterStyle="min-width: 48px;">
+                        <h:outputText value="#{item.get('an')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.perioada']}" sortBy="#{item.get('per')}"
+                              filterBy="#{item.get('per')}" field="q.per" filterMaxLength="2">
+                        <h:outputText value="#{item.get('per')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.ccenter']}" sortBy="#{item.get('cost_cntr')}"
+                              filterBy="#{item.get('cost_cntr')}" field="q.cost_cntr" filterMaxLength="10">
+                        <h:outputText value="#{item.get('cost_cntr')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.ccenter.nume']}" sortBy="#{item.get('cost_cntr_nume')}"
+                              filterBy="#{item.get('cost_cntr_nume')}" field="q.cost_cntr_nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('cost_cntr_nume')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.cont']}" sortBy="#{item.get('cont_ccoa')}"
+                              filterBy="#{item.get('cont_ccoa')}" field="q.cont_ccoa" filterMaxLength="10" filterStyle="width: 7em;">
+                        <h:outputText value="#{item.get('cont_ccoa')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.cont.nume']}" sortBy="#{item.get('cont_ccoa_nume')}"
+                              filterBy="#{item.get('cont_ccoa_nume')}" field="q.cont_ccoa_nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('cont_ccoa_nume')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.cdriver']}" sortBy="#{item.get('cost_driver')}"
+                              filterBy="#{item.get('cost_driver')}" field="p.cost_driver" filterMaxLength="5">
+                        <h:outputText value="#{item.get('cost_driver')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.categ']}" sortBy="#{item.get('opex_categ')}"
+                              filterBy="#{item.get('opex_categ')}" field="q.opex_categ" filterMaxLength="5">
+                        <h:outputText value="#{item.get('opex_categ')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.categ.nume']}" sortBy="#{item.get('opex_categ_nume')}"
+                              filterBy="#{item.get('opex_categ_nume')}" field="p.nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('opex_categ_nume')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.antet.text']}" styleClass="large_text" sortBy="#{item.get('text_antet')}"
+                              filterBy="#{item.get('text_antet')}" field="q.text_antet" filterMaxLength="30">
+                        <h:outputText value="#{item.get('text_antet')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.doc.nume']}" styleClass="large_text" sortBy="#{item.get('text_nume')}"
+                              filterBy="#{item.get('text_nume')}" field="q.text_nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('text_nume')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.obj.part']}" sortBy="#{item.get('obj_part')}"
+                              filterBy="#{item.get('obj_part')}" field="q.obj_part" filterMaxLength="30">
+                        <h:outputText value="#{item.get('obj_part')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.obj.part.nume']}" sortBy="#{item.get('obj_part_nume')}"
+                              filterBy="#{item.get('obj_part_nume')}" field="q.obj_part_nume" filterMaxLength="30">
+                        <h:outputText value="#{item.get('obj_part_nume')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.furnizor']}" sortBy="#{item.get('furnizor')}"
+                              filterBy="#{item.get('furnizor')}" field="q.furnizor" filterMaxLength="30">
+                        <h:outputText value="#{item.get('furnizor')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.ic.part']}" sortBy="#{item.get('part_ic')}"
+                              filterBy="#{item.get('part_ic')}" field="q.part_ic" filterMaxLength="5">
+                        <h:outputText value="#{item.get('part_ic')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.ic.part.nume']}" sortBy="#{item.get('part_ic_nume')}"
+                              filterBy="#{item.get('part_ic_nume')}" field="r.nume" filterMaxLength="5">
+                        <h:outputText value="#{item.get('part_ic_nume')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['recs.col.doc.nr']}">
+                        <h:outputText value="#{item.get('doc_nr')} - #{item.get('doc_poz')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.valoare']}" style="text-align:right;">
+                        <h:outputText value="#{item.get('valoare')}">
+                            <f:convertNumber pattern="###,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}" sortBy="#{item.get('mod_de')}"
+                              filterBy="#{item.get('mod_de')}" field="q.mod_de" filterMaxLength="20">
+                       <h:outputText value="#{item.get('mod_de')}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}" sortBy="#{item.get('mod_timp')}"
+                              filterBy="#{item.get('mod_timp')}" field="q.mod_timp" filterMaxLength="20">
+                        <h:outputText value="#{item.get('mod_timp')}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:panel id="panel-footer">
+                    <h:outputText value="#{uimess['col.pozitii']}: " style="font-weight: bold;"/>
+                    <h:outputText value="#{arecs.list.rowCount}" id="count">
+                        <f:convertNumber pattern="###,##0"/>
+                    </h:outputText>
+
+                    <p:spacer width="10"/>
+
+                    <h:outputText value="#{uimess['col.suma']}: " style="font-weight: bold;"/>
+                    <h:outputText value="#{arecs.list.suma}" id="suma">
+                        <f:convertNumber pattern="###,##0.00"/>
+                    </h:outputText>
+                </p:panel>
+
+                <p:contextMenu selectionMode="multiple" for='tabela'>                    
+                    <p:menuitem id="cntx-delete-sel" value="#{uimess['recs.actual.btn.del.sel.value']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete-sel').click();"/>
+                    <p:menuitem id="cntx-change" value="#{uimess['mess.chg']}" icon="fa fa-pencil" url="javascript:void(0)" onclick="jQuery('#list\\:menu-change').click();"/>
+                    <p:menuitem id="cntx-reset" value="#{uimess['mess.reset']}" icon="fa fa-filter" url="javascript:void(0)" onclick="jQuery('#list\\:menu-reset').click();"/>
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+
+                <p:remoteCommand id="init" name='init' action="#{arecs.datainit()}" update='tabela,panel-footer'
+                             onstart="PF('block').show();" oncomplete="tableEndUpdate();" ignoreAutoUpdate="true"/>
+                <p:remoteCommand id="refreshfooter" name="refreshfooter" update="panel-footer" ignoreAutoUpdate="true"/>
+            </h:form>
+
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true"
+                            fitViewport="true" blockScroll="true"
+                            closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="clear" name="clear" action="#{arecs.clear()}" update="fdlg:dialog"
+                                 process="@this" partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+            
+            <script>
+                /* <![CDATA[ */                
+                function downloadStart(){
+                    PF('block').show();
+                }
+                
+                function downloadEnd(){
+                    PF('block').hide();
+                }
+                
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+                
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+
+    <p:staticMessage severity='warn' detail="#{uimess['dset.per.nosel']}" rendered="#{empty dper.selected}"/>
+    <p:staticMessage severity='warn' detail="#{dper.initError}" rendered="#{not empty dper.initError}"/>
+    <p:panelGrid id='panel' rendered="#{not empty dper.selected and empty dper.initError}">
+        <f:facet name="header">
+            <p:row>
+                <p:column colspan="2" style="font-weight: normal; text-align: left;">
+                    <h:outputText value="#{uimess['dset.per.del.quest.1']}"/><br/>
+                    <h:outputText value="#{uimess['dset.per.del.quest.2']}"/>
+                </p:column>
+            </p:row>
+            <p:row>
+                <p:column>
+                    <h:outputText value="#{uimess['col.an']}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{uimess['col.perioada']}"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        
+        <p:row>
+            <p:column>
+                <h:outputText value="#{dper.selected.an}"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{dper.selected.per} #{dper.selected.per_nume}"/>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id='delete' widgetVar="dialog-delete" value="#{uimess['mess.del']}" icon="fa fa-trash"
+                                     action="#{dper.delete()}" update="panel"
+                                     onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-delete').disable();"
+                                     oncomplete="PF('dialog-delete').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

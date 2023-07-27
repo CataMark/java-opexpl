@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['coarea.nosel']}" rendered="#{empty coarea.selected}"/>
+    <p:panelGrid id='panel' rendered="#{not empty coarea.selected}">
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.cod']}" for="cod"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="cod" value="#{coarea.selected.cod}"
+                            readonly="#{not empty coarea.selected.mod_timp}" size="4" maxlength="4"
+                            validatorMessage="#{uimess['col.cod']}: #{uimess['valid.4numbers']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="4" maximum="4"/>
+                    <f:validateRegex pattern="[0-9]+"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.nume']}" for="nume"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="nume" value="#{coarea.selected.nume}" size="30" maxlength="100"
+                             validatorMessage="#{uimess['col.nume']}: #{uimess['valid.1to100chars']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="1" maximum="100"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.acronim']}" for="acronim"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="acronim" value="#{coarea.selected.acronim}" size="5" maxlength="5"
+                            validatorMessage="#{uimess['col.acronim']}: #{uimess['valid.3to5capit']}">
+                   <f:validateRequired/>
+                   <f:validateLength minimum="3" maximum="5"/>
+                   <f:validateRegex pattern="[A-Z]+"/>
+               </p:inputText>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.alocare']}" for="alocare"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="alocare" value="#{coarea.selected.alocare}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.hier']}" for="hier"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="hier" value="#{coarea.selected.hier}" size="5" maxlength="5"
+                             validatorMessage="#{uimess['col.hier']}: #{uimess['valid.5capitornumb']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="5" maximum="5"/>
+                    <f:validateRegex pattern="[0-9A-Z]+"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save"
+                             action="#{coarea.save()}" update="panel"
+                             onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                             oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

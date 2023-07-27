@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./WEB-INF/resources/fcomps/template_no_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['pass.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['pass.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu"/>
+    
+    <ui:define name="content">
+        <style type="text/css">
+            #pass-change\:panel .ui-widget-content{
+                border-top: none;
+                border-bottom: none;
+            }
+            #pass-change\:panel .ui-panelgrid-cell{
+                border: none;
+            }
+        </style>
+        <h:form id="pass-change" style="display: inline-block;">
+            <!-- Nu este necesar la login cu Azure Active Directory
+            <p:panelGrid id="panel" columns="3">
+                <f:facet name="header">
+                    <h:outputText value="#{portal_user.user.prenume} #{portal_user.user.nume}"/>
+                </f:facet>
+                
+                <p:outputLabel value="#{uimess['pass.input.1']}" for="@next"/>
+                <p:password id="pass1" value="#{portal_user.pass1}" required="true" requiredMessage="#{uimess['mess.required']}" size="30" maxlength="255">
+                    <p:ajax event="change" listener="#{portal_user.setPass2(null)}" update="pass2"/>
+                </p:password>
+                <p:message for="@previous"/>
+                
+                <p:outputLabel value="#{uimess['pass.input.2']}" for="@next"/>
+                <p:password id="pass2" value="#{portal_user.pass2}" required="true" requiredMessage="#{uimess['mess.required']}" size="30" maxlength="255"/>
+                <p:message for="@previous"/>
+                
+                <f:facet name="footer">
+                    <p:commandButton id="save" value="#{uimess['mess.save']}" action="#{portal_user.changePass()}" update="@form" icon="fa fa-save"/>
+                    <p:spacer width="10"/>
+                    <p:commandButton id="home" value="#{uimess['mess.firstpage']}" action="/index.xhtml?faces-redirect=true" immediate="true"
+                                     process="@this" partialSubmit="true" icon="fa fa-home"/>
+                    <p:defaultCommand target="save"/>
+                </f:facet>
+            </p:panelGrid>
+            -->
+            <h:outputScript>jQuery('#progress-bar').fadeOut(800);</h:outputScript>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['dset.per.nosel']}" rendered="#{empty dper.selected}"/>
+    <p:staticMessage severity='warn' detail="#{dper.initError}" rendered="#{not empty dper.initError}"/>
+    <p:panelGrid id='panel' rendered="#{not empty dper.selected and empty dper.initError}">
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.an']}" for="an"/>
+            </p:column>
+            <p:column>
+                <c:if test="#{empty dper.selected.mod_timp}">
+                    <p:inputNumber id="an" value="#{dper.selected.an}" size="4" maxlength="4" decimalPlaces="0" thousandSeparator=""
+                                   validatorMessage="#{uimess['col.an']}: #{uimess['valid.an']}">
+                        <f:validateRequired/>
+                        <f:validateLongRange minimum="2000" maximum="9999"/>
+                    </p:inputNumber>
+                </c:if>
+                <c:if test="#{not empty dper.selected.mod_timp}">
+                    <h:outputText id="an" value="#{dper.selected.an}"/>
+                </c:if>
+            </p:column>
+        </p:row>
+
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.perioada']}" for="per"/>
+            </p:column>
+            <p:column>
+                <c:if test="#{empty dper.selected.mod_timp}">
+                    <p:selectOneMenu id="per" value="#{dper.selected.per}" validatorMessage="#{uimess['col.perioada']}: #{uimess['mess.required']}">
+                        <f:validateRequired/>
+                        <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                        <f:selectItems value="#{dper.luni}" var="item" itemLabel="#{item.cod} #{item.nume}" itemValue="#{item.cod}"/>
+                    </p:selectOneMenu>
+                </c:if>
+                <c:if test="#{not empty dper.selected.mod_timp}">
+                    <h:outputText id="per" value="#{dper.selected.per} #{dper.selected.per_nume}"/>
+                </c:if>
+            </p:column>
+        </p:row>
+
+        <p:row rendered="#{not dper.dataset.actual}">
+            <p:column>
+                <p:outputLabel value="Actual" for="actual"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="actual" value="#{dper.selected.actual}"/>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id="save" widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save" action="#{dper.save()}"
+                             update="panel" rendered="#{not dper.dataset.actual}"
+                             onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                             oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

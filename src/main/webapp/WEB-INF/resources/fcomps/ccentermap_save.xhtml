@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['ccmap.nosel']}" rendered="#{empty cmap.selected}"/>
+    <p:staticMessage severity='warn' detail="#{cmap.initError}" rendered="#{not empty cmap.initError}"/>
+    <p:panelGrid id='panel' rendered="#{not empty cmap.selected and empty cmap.initError}">
+        <f:facet name="header">
+            <p:row>
+                <p:column colspan="2" style="text-align: left;">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save" action="#{cmap.save()}" update="panel"                             
+                             onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                             oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['ccmap.col.sender']}" for="sender"/>
+            </p:column>
+            <p:column>
+                <h:outputText id='sender' value="#{cmap.selected.sender} #{cmap.selected.sender_nume}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column colspan="2">
+                <p:outputLabel value="#{uimess['ccmap.col.receiver']}" for="receiver"/>
+            </p:column>
+        </p:row>
+        <p:row>
+            <p:column colspan="2">
+                <p:tree id='receiver' style="width:auto; max-height: 300px; overflow-y: scroll;"
+                        value='#{cmap.hier}' var='item' selectionMode="single" selection="#{cmap.receiver}"
+                        filterBy="#{item.cod} #{item.nume}" filterMatchMode="contains"
+                        requiredMessage="#{uimess['ccmap.col.receiver']}: #{uimess['mess.required']}" required="true">
+                    <p:treeNode>
+                        <h:outputText value="#{item.cod} #{item.nume}"
+                            style="#{not item.leaf ? 'font-weight: bold;':''}
+                                #{item.blocat ? 'text-decoration: line-through;':''}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:column>
+        </p:row>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <f:view locale="#{portal_lang.locale}" contentType="text/html" encoding="UTF-8">
+        <ui:insert name='metadata'/>
+
+        <h:head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+            <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+            <meta http-equiv="Pragma" content="no-cache" />
+            <meta http-equiv="Expires" content="0" />
+            <h:outputStylesheet library="css" name="template.css"/>
+            <script type="text/javascript">
+            /* <![CDATA[ */
+            function idleMessage(){
+                PF("growl").removeAll();
+                PF("growl").renderMessage({
+                    "summary":"#{uimess['mess.idle.title']}",
+                    "detail":"#{uimess['mess.idle.dtl']}",
+                    "severity":"warn"
+                });
+            }
+
+            function ajaxErrorMessage(){
+                PF('growl').removeAll();
+                PF('growl').renderMessage({
+                    'summary':"#{uimess['mess.errajax.title']}",
+                    'detail':"#{uimess['messerrajax.dtl']}",
+                    'severity':'error'
+                });
+            }
+            
+            jQuery("html").on("click", function(event){
+                let wideScreen = (jQuery(window).width() > 768);
+                if (!wideScreen && jQuery("#sidenav").css("display") !== "none" &&
+                    jQuery(event.target).closest("#menu-button, #sidenav").length === 0)
+                    jQuery("#sidenav").toggle();
+            });
+            /* ]]> */
+            </script>
+        </h:head>
+
+        <h:body>
+            <title><ui:insert name="browser-title">Portal Financiar</ui:insert></title>
+            
+            <h:form id="app" prependId="false">
+                <p:growl id="growl" widgetVar="growl" showDetail="true" sticky="true" globalOnly="true"><p:autoUpdate/></p:growl>
+                <p:ajaxStatus onstart="jQuery('#progress-bar').show();" oncomplete="jQuery('#progress-bar').fadeOut(800);"
+                              onerror="ajaxErrorMessage();"/>
+                <p:idleMonitor multiWindowSupport="true" timeout="#{session.maxInactiveInterval * 1000}" onidle="idleMessage();"/>
+            </h:form>
+            
+            <div class="app-layout">
+                <div id="topbar">
+                    <div id="app-header" class="layout-row">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="width: 3rem; padding-right: 1rem;">
+                                    <p:link id="menu-button" title="#{uimess['tmpl.appmenu.title']}" href="javascript:void(0)" onclick="jQuery('#sidenav').toggle();">
+                                        <span class="fa fa-bars"></span>
+                                    </p:link>
+                                </td>
+                                <td style="font-size: 1.5rem; color: white; white-space: nowrap; overflow: hidden;">
+                                    <ui:insert name="page-title">Portal Financiar</ui:insert>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="header-right">
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <ui:insert name="lang-menu">Menu</ui:insert>
+                                    </td>
+                                    <td>
+                                        <ui:insert name="user-menu">Menu</ui:insert>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="layout-row" style="height: 0.5rem;">
+                        <p:progressBar id="progress-bar" widgetVar="progress-bar" mode="indeterminate" displayOnly="true"
+                                           style="height: 100%; border-radius: 0; border: none; background: none;"/>
+                    </div>
+                </div>
+                <div id="app-main" class="layout-row">
+                    <table celpadding="0" cellspacing="0">
+                        <tr>
+                            <td>
+                                <div id="sidenav">
+                                    <ui:insert name="app-menu">Menu</ui:insert>
+                                </div>
+                            </td>
+                            <td id="app-content">
+                                <ui:insert name="content">Content</ui:insert>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <script type="text/javascript">
+                /* <![CDATA[ */                
+                //jQuery("#progress-bar").fadeOut(800);
+                /* ]]> */
+            </script>
+        </h:body>
+    </f:view>
+</html>
+

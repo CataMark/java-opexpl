@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./WEB-INF/resources/fcomps/template_no_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['e500.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['app.name']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu"/>
+    
+    <ui:define name="content">
+        <h:form id='content'>
+            <p:panel header="#{uimess['e500.title']}">
+                <h3><h:outputText value="#{uimess['e500.message.1']}"/></h3>
+                <h:outputText value="#{uimess['e500.message.2']}"/><br/>
+                <h:outputText value="Cătălin , "/><p:link href="mailto:mail@example.com" style="color: #1976d2;">mail@example.com</p:link>
+                <f:facet name="footer">
+                    <p:link value="#{uimess['err.firstpage.text']}" outcome="index"
+                            style="font-weight: bold; font-size: 1.2em; color: #1976d2;"/>
+                </f:facet>
+            </p:panel>
+        </h:form>
+        <h:outputScript>jQuery('#progress-bar').fadeOut(800);</h:outputScript>
+    </ui:define>
+</ui:composition>

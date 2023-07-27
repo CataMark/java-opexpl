@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <style type='text/css'>        
+        #fdlg .ui-panelgrid .ui-widget-content{
+            border: none;
+        }
+        #fdlg .ui-panelgrid .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg .ui-panelgrid .ui-panelgrid-cell{
+            border: none;
+        }
+        
+        #fdlg .eticheta{
+            width: 9em;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['dset.nosel']}" rendered="#{empty dset.selected}"/>
+    <p:staticMessage severity='warn' detail="#{dset.initError}" rendered="#{not empty dset.initError}"/>
+    <c:if test="#{not empty dset.selected and empty dset.initError}">
+        
+        <p:panelGrid id='panel_1'>
+            <p:row>
+                <p:column colspan="2">
+                    <p:messages closable="true"/>
+                </p:column>
+            </p:row>
+            
+            <p:row rendered="#{not empty dset.selected.mod_timp}">
+                <p:column styleClass="eticheta">
+                    <p:outputLabel value="#{uimess['col.id']}" for="id"/>
+                </p:column>
+                <p:column>
+                    <h:outputText id="id" value="#{dset.selected.id}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column styleClass="eticheta">
+                     <p:outputLabel value="#{uimess['col.nume']}" for="nume"/>
+                </p:column>
+                <p:column>
+                    <p:inputText id="nume" value="#{dset.selected.nume}" size="20" maxlength="20"
+                                 validatorMessage="#{uimess['col.nume']}: #{uimess['valid.1to20chars']}">
+                        <f:validateRequired/>
+                        <f:validateLength minimum="1" maximum="20"/>
+                    </p:inputText>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column styleClass="eticheta">
+                     <p:outputLabel value="#{uimess['col.an']}" for="an"/>
+                </p:column>
+                <p:column>
+                    <h:outputText id="an" value="#{dset.selected.an}"/>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column styleClass="eticheta">
+                    <p:outputLabel value="#{uimess['col.vers']}" for="vers"/>
+                </p:column>
+                <p:column rendered="#{empty dset.selected.mod_timp}">
+                    <p:selectOneMenu id="vers" value="#{dset.selected.vers}" validatorMessage="#{uimess['col.vers']}: #{uimess['mess.required']}">
+                        <p:ajax event="change" update="toggle" listener="#{dset.clearRefSets()}"
+                                onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                                oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                        <f:validateRequired/>
+                        <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                        <f:selectItems value="#{dset.versiuni}" var="item" itemLabel="#{item.cod} #{item.nume}" itemValue="#{item.cod}"/>
+                    </p:selectOneMenu>
+                </p:column>
+                
+                <p:column rendered="#{not empty dset.selected.mod_timp}">
+                    <h:outputText value="#{dset.selected.vers}"/>
+                </p:column>
+            </p:row>
+
+            <p:row rendered="#{not empty dset.selected.mod_timp}">
+                <p:column styleClass="eticheta">
+                    <p:outputLabel value="#{uimess['col.blocat']}" for="blocat"/>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="blocat" value="#{dset.selected.blocat}"/>
+                </p:column>
+            </p:row>
+
+            <p:row rendered="#{not empty dset.selected.mod_timp}">
+                <p:column styleClass="eticheta">
+                    <p:outputLabel value="#{uimess['col.closed']}" for="closed"/>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="closed" value="#{dset.selected.incheiat}"/>
+                </p:column>
+            </p:row>
+            
+            <p:row rendered="#{not empty dset.selected.mod_timp and not dset.selected.actual}">
+                <p:column styleClass="eticheta">
+                    <p:outputLabel value="#{uimess['col.reporting']}" for="raportare"/>
+                </p:column>
+                <p:column>
+                    <p:selectBooleanCheckbox id="raportare" value="#{dset.selected.raportare}"/>
+                </p:column>
+            </p:row>
+            
+            <p:row rendered="#{dset.hasValues and not empty dset.selected.actual_set}">
+                <p:column styleClass="eticheta">
+                    <p:outputLabel value="#{uimess['col.actual.from']}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{dset.selected.actual_set} #{dset.selected.actual_set_nume} - #{dset.selected.actual_set_vers} #{dset.selected.actual_set_an}"/>
+                </p:column>
+            </p:row>
+        </p:panelGrid>
+                
+        <p:outputPanel id="toggle" rendered="#{not dset.selected.actual}">
+            <p:panelGrid id="panel_2" rendered="#{not dset.versIsActual() and not dset.hasValues}">
+                <p:row>
+                    <p:column styleClass="eticheta">
+                        <h:outputLabel value="#{uimess['col.actual.an']}" for="act_set_an"/>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu id="act_set_an" value="#{dset.selected.actual_set_an}">
+                            <p:ajax event="change" update="act_set" listener="#{dset.clearActualSet()}"
+                                    onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                                    oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);">
+                                <p:resetInput target="act_set"/>
+                            </p:ajax>
+                            <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                            <f:selectItems value="#{dset.ani}" var="item" itemLabel="#{item.toString()}" itemValue="#{item}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column styleClass="eticheta">
+                        <h:outputLabel value="#{uimess['col.actual.from']}" for="act_set"/>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu id="act_set" value="#{dset.selected.actual_set}">
+                            <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                            <f:selectItems value="#{dset.actualSets}" var="item" itemLabel="#{item.id} #{item.nume} - #{item.vers}" itemValue="#{item.id}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+            
+            <p:panelGrid id="panel_3" rendered="#{not dset.versIsActual()}">
+                <p:row>
+                    <p:column styleClass="eticheta">
+                        <h:outputLabel value="#{uimess['col.compare.an']}" for="comp_an"/>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu id="comp_an" value="#{dset.selected.compar_an}">
+                            <p:ajax event="change" update="comp_set" listener="#{dset.clearCompare()}"
+                                    onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                                    oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);">
+                                <p:resetInput target="comp_set"/>
+                            </p:ajax>
+                            <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                            <f:selectItems value="#{dset.ani}" var="item" itemLabel="#{item.toString()}" itemValue="#{item}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column styleClass="eticheta">
+                        <h:outputLabel value="#{uimess['col.compare']}" for="comp_set"/>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu id="comp_set" value="#{dset.selected.compar}">
+                            <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                            <f:selectItems value="#{dset.compares}" var="item" itemLabel="#{item.id} #{item.nume} - #{item.vers}" itemValue="#{item.id}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </p:outputPanel>
+        
+        <p:panelGrid id="panel_4" columns="1">
+            <f:facet name="footer">
+                <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save"
+                                 action="#{dset.save()}" update="panel_1"
+                                 onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                                 oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+            </f:facet>
+        </p:panelGrid>        
+    </c:if>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

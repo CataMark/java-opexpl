@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['users.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['users.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <c:if test="#{not empty usersByGroupPrompt.initError}">
+            <p:staticMessage severity="warn" detail="#{usersByGroupPrompt.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty usersByGroupPrompt.initError}">
+            <style type="text/css">
+                #prompt{
+                    display: inline-block;
+                }
+
+                #prompt\:panel .ui-widget-content{
+                    border-bottom: none;
+                }
+                #prompt\:panel .ui-widget-content:not(:first-child){
+                    border-top: none;
+                }        
+                #prompt\:panel .ui-panelgrid-cell{
+                    border: none;
+                }
+            </style>
+
+            <h:form id="prompt">
+                <p:panelGrid id="panel">
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:messages closable="true"/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.group']}" for="grup"/>
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu id="grup" value="#{usersByGroupPrompt.selected}" validatorMessage="#{uimess['col.group']}: #{uimess['mess.required']}">
+                                <f:selectItem itemLabel="#{uimess['mess.select']}:" itemValue=""/>
+                                <f:selectItems value="#{usersByGroupPrompt.groups}" var="item" itemLabel="#{item.cod}" itemValue="#{item.cod}"/>
+                                <f:validateRequired/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+
+                    <f:facet name="footer">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:commandButton id="submit" widgetVar="prompt-submit" ajax="false" value="#{uimess['mess.aplica']}" icon="fa fa-chevron-right"
+                                        action="#{usersByGroupPrompt.navigate('list')}"/>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                </p:panelGrid>
+            </h:form>
+
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

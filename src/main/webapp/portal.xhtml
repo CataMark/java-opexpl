@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./WEB-INF/resources/fcomps/template_no_menu.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:define name='metadata'/>
+    <ui:define name="browser-title">#{uimess['app.name']}</ui:define>
+    <ui:define name="page-title">#{uimess['app.name']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu"/>
+    
+    <ui:define name="content">
+        <h:form id='content'>
+            <p:panel header="#{uimess['portal.title']}">
+                <h3><h:outputText value="#{uimess['portal.message']}"/></h3>
+            </p:panel>
+        </h:form>
+        <p:remoteCommand id='redirect' name="redirect" action="#{facesContext.externalContext.redirect(initParam['ro.any.c12153.PORTAL_HOME_PAGE'].concat('?lang=').concat(portal_lang.language))}"
+                         process="@this" partialSubmit="true" autoRun="true"/>
+    </ui:define>
+</ui:composition>

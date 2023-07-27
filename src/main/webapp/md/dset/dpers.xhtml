@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/resources/fcomps/template_w_menu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="metadata"/>
+    <ui:define name="browser-title">#{uimess['dset.title']}</ui:define>
+    <ui:define name="page-title">#{uimess['dset.title']}</ui:define>
+    <ui:define name="lang-menu"/>
+    <ui:define name="user-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_user_menu.xhtml"/>
+    </ui:define>
+    <ui:define name="app-menu">
+        <ui:include src="/WEB-INF/resources/fcomps/template_app_menu.xhtml"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="breadcrumb">
+            <p:breadCrumb>
+                <p:menuitem title="#{uimess['mess.selectie']}" value="#{uimess['mess.selectie']}" action="#{dperlist.navigate('index')}"
+                            ajax="false" icon="fa fa-home" style="text-decoration: none; font-size: 1.2em;"/>
+                <p:menuitem value="#{uimess['col.sets']}" action="#{dperlist.navigate('dsets')}"/>
+                <p:menuitem value="#{uimess['col.perioade']}" url="javascript:void(0)" style="font-weight: bold; color: black;"/>
+            </p:breadCrumb>
+        </h:form>
+        
+        <c:if test="#{not empty dperlist.initError}">
+            <p:staticMessage severity="warn" detail="#{dperlist.initError}"/>
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                jQuery(document).ready(function() {
+                    jQuery("#progress-bar").fadeOut(800);
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+        
+        <c:if test="#{empty dperlist.initError}">
+            <h:outputScript library="js" name="jquery.stickytableheaders.min.js" target="head"/>
+            <style type="text/css">
+                #list{
+                    display: inline-block;
+                }
+
+                #list\:tabela table{
+                    width: auto;
+                    white-space: nowrap;
+                    font-size: inherit;
+                }
+            </style>
+            <br/>
+            <h:form id='selection'>
+                <p:panelGrid id='panel'>
+                    <p:row>
+                        <p:column style='font-weight: bold;'>
+                            <h:outputText value="#{uimess['col.dset']}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{dperlist.dataset.id} #{dperlist.dataset.nume} - #{dperlist.dataset.vers} #{dperlist.dataset.an}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+            <br/>
+            <h:form id='list'>
+                <p:menubar style="margin-bottom: 2px;">
+                    <p:menuitem id="menu-add" title="#{uimess['dset.per.btn.add.title']}" value="#{uimess['mess.add']}" icon='fa fa-plus'
+                                action="#{dperlist.newItem()}" update='fdlg:dialog' process="@this" partialSubmit="true"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/datasetper_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['dset.per.btn.add.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{dper.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-change" title="#{uimess['dset.per.btn.chg.title']}" value="#{uimess['mess.chg']}" icon='fa fa-pencil'
+                                action="#{dperlist.passSelected(true)}" update='fdlg:dialog'
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/datasetper_save.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['dset.per.btn.chg.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{dper.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-delete" title="#{uimess['dset.per.btn.del.title']}" value="#{uimess['mess.del']}" icon="fa fa-trash"
+                                action="#{dperlist.passSelected(false)}" update="fdlg:dialog"
+                                onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                        <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/datasetper_delete.xhtml" target="#{dialog.address}"/>
+                        <f:setPropertyActionListener value="#{uimess['dset.per.btn.del.dialog']}" target="#{dialog.title}"/>
+                        <f:setPropertyActionListener value="PF('dialog').hide(); update();" target="#{dper.finishScript}"/>
+                        <p:resetInput target="fdlg:dialog"/>
+                    </p:menuitem>
+
+                    <p:menuitem id="menu-refresh" title="#{uimess['mess.rfrsh.title']}" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh"
+                                oncomplete="init();"/>
+
+                    <p:submenu label="#{uimess['col.mass']}" icon="fa fa-copy">
+                        <p:menuitem id="menu-delall" title="#{uimess['dset.per.btn.delall.title']}" value="#{uimess['dset.per.btn.delall.value']}" icon="fa fa-trash"
+                                        update="fdlg:dialog"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/datasetper_delete_all.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['dset.per.btn.delall.title']}" target="#{dialog.title}"/>
+                            <f:setPropertyActionListener value="PF('dialog').hide(); init();" target="#{dperlist.finishScript}"/>
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+
+                        <p:menuitem id="menu-copy" title="#{uimess['dset.per.btn.copy.title']}" value="#{uimess['col.copy']}" icon="fa fa-copy"
+                                        update="fdlg:dialog"
+                                        onstart="jQuery('div.ui-menu a').addClass('ui-state-disabled');" oncomplete="PF('dialog').show();">
+                            <f:setPropertyActionListener value="/WEB-INF/resources/fcomps/00_copy_from_set.xhtml" target="#{dialog.address}"/>
+                            <f:setPropertyActionListener value="#{uimess['dset.per.btn.copy.dialog']}" target="#{dialog.title}"/>
+                            <f:setPropertyActionListener value="0" target="#{copyfromdset.alternativa}"/>
+                            <f:setPropertyActionListener value="PF('dialog').hide(); init();" target="#{copyfromdset.finishScript}"/>
+
+                            <f:setPropertyActionListener value="#{empty dperlist.list}" target="#{copyfromdset.okFlag}"/>
+                            <f:setPropertyActionListener value="#{uimess['dset.per.btn.copy.err']}" target="#{copyfromdset.nokMessage}"/>                                
+                            <p:resetInput target="fdlg:dialog"/>
+                        </p:menuitem>
+                    </p:submenu>
+                </p:menubar>
+
+                <p:dataTable id='tabela' widgetVar="tabela" value='#{dperlist.list}' var='item' sortBy='#{item.an}.#{item.per}'
+                             selectionMode="single" selection="#{dperlist.selected}" rowKey="#{item.id}" reflow="true">
+
+                    <p:column headerText="#{uimess['col.an']}">
+                        <h:outputText value="#{item.an}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.cod']}">
+                        <h:outputText value="#{item.per}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.nume']}">
+                        <h:outputText value="#{item.per_nume}"/>
+                    </p:column>
+
+                    <p:column headerText="Actual" rendered="#{not dperlist.dataset.actual}">
+                        <span class="#{item.actual == true? 'fa fa-check': ''}"></span>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.user']}">
+                        <h:outputText value="#{item.mod_de}"/>
+                    </p:column>
+
+                    <p:column headerText="#{uimess['col.time']}">
+                        <h:outputText value="#{item.mod_timp}">
+                            <f:convertDateTime type="both" dateStyle="short" timeStyle="short"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:contextMenu for='tabela' selectionMode="single">
+                    <p:menuitem id="cntx-change" value="#{uimess['mess.chg']}" icon="fa fa-pencil" url="javascript:void(0)" onclick="jQuery('#list\\:menu-change').click();"/>
+                    <p:menuitem id="cntx-delete" value="#{uimess['mess.del']}" icon="fa fa-trash" url="javascript:void(0)" onclick="jQuery('#list\\:menu-delete').click();"/>
+                    <p:menuitem id="cntx-refresh" value="#{uimess['mess.rfrsh']}" icon="fa fa-refresh" url="javascript:void(0)" onclick="jQuery('#list\\:menu-refresh').click();"/>
+                </p:contextMenu>
+
+                <p:blockUI id="block" widgetVar="block" block="@form"/>
+            </h:form>
+        
+            <h:form id="fdlg">
+                <p:dialog id="dialog" widgetVar="dialog" header="#{dialog.title}" modal="true" dynamic="true" fitViewport="true" blockScroll="true"
+                          closanyEscape="true" onHide="jQuery('div.ui-menu a').removeClass('ui-state-disabled'); clear();">
+                    <ui:include src="#{dialog.address}"/>
+                </p:dialog>
+            </h:form>
+
+            <h:form id="funct">
+                <p:remoteCommand id="init" name="init" action="#{dperlist.datainit()}" update="list:tabela"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="tableEndUpdate();"/>
+
+                <p:remoteCommand id="update" name="update" update="list:tabela"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"
+                                 onstart="PF('block').show();" oncomplete="tableEndUpdate();"/>
+
+                <p:remoteCommand id='clear' name='clear' action="#{dperlist.clear()}" update="fdlg:dialog"
+                                 process='@this' partialSubmit="true" ignoreAutoUpdate="true"/>
+            </h:form>
+            
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                function tableEndUpdate(){
+                    PF('block').hide();                    
+                    jQuery('#list\\:tabela table').stickyTableHeaders();
+                }
+
+                jQuery(document).ready(function() {
+                    init();
+                    PF('growl').renderMessage({"summary":"#{uimess['growl.tblmenu.basic.title']}",
+                                                "detail":"#{uimess['growl.tblmenu.basic.dtl']}",
+                                                "severity":"info"});
+                });
+                /* ]]> */
+            </script>
+        </c:if>
+    </ui:define>
+</ui:composition>

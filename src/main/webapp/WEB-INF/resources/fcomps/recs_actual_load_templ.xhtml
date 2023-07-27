@@ -1,0 +1,247 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type="text/css">
+        #fdlg .ui-panelgrid tbody td{
+            white-space: pre-line;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:panelGrid id='panel-1'>
+        <f:facet name="header">
+            <p:row>
+                <p:column>
+                    <h:outputText value="data_set"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="an"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="per"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="coarea"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="cost_cntr"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="cost_cntr_nume"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="cont_ccoa"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="cont_ccoa_nume"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="opex_categ"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="text_antet"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="text_nume"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="obj_part"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="obj_part_nume"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        <p:row>
+            <p:column>
+                <!-- data_set -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{arecs.dataset.id}" style="font-weight: bold;"/>
+            </p:column>
+            <p:column>
+                <!-- an -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.4digit']}"/>
+            </p:column>
+            <p:column>
+                <!-- per -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.2chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- coarea -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{arecs.coarea.cod}" style="font-weight: bold;"/>
+            </p:column>
+            <p:column>
+                <!-- cost_cntr -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to10chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- cost_cntr_nume -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to100chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- cont_ccoa -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.10digit']}"/>
+            </p:column>
+            <p:column>
+                <!-- cont_ccoa_nume -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to100chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- opex_categ -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.5digit']}"/>
+            </p:column>
+            <p:column>
+                <!-- text_antet -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to1000chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- text_nume -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to4000chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- obj_part -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to30chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- obj_part_nume -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to50chars']}"/>
+            </p:column>
+        </p:row>
+    </p:panelGrid>
+    
+    <br/>
+    
+    <p:panelGrid id='panel-2'>
+        <f:facet name="header">
+            <p:row>
+                <p:column>
+                    <h:outputText value="doc_nr"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="doc_poz"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="furnizor"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="part_ic"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="oper_ref"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="tranz_afac"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="tranz_orig"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="debit_credit"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="valoare"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="cantitate"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="umas"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="data_creat"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        <p:row>
+            <p:column>
+                <!-- doc_nr -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to10chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- doc_poz -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.int']}"/>
+            </p:column>
+            <p:column>
+                <!-- furnizor -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to1000chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- part_ic -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to5digit']}"/>
+            </p:column>
+            <p:column>
+                <!-- oper_ref -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to5chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- tranz_afac -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to5chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- tranz_orig -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to5chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- debit_credit -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- valoare -->
+                <h:outputText value="#{uimess['upload.templ.required']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.double']}"/>
+            </p:column>
+            <p:column>
+                <!-- cantitate -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.double']}"/>
+            </p:column>
+            <p:column>
+                <!-- umas -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.1to10chars']}"/>
+            </p:column>
+            <p:column>
+                <!-- data_creat -->
+                <h:outputText value="#{uimess['upload.templ.optional']}:"/><br/>
+                <h:outputText value="#{uimess['upload.templ.date']}"/>
+            </p:column>
+        </p:row>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

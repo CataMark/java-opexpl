@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content:not(:last-child){
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['ccenter.nosel']}" rendered="#{empty ccenter.selected}"/>
+    <p:staticMessage severity='warn' detail="#{ccenter.initError}" rendered="#{not empty ccenter.initError}"/>
+    <p:panelGrid id='panel' rendered="#{not empty ccenter.selected and empty ccenter.initError}">
+        <f:facet name="header">
+            <p:row>
+                <p:column colspan="2" style="text-align: left;">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save" action="#{ccenter.save()}" update="panel"
+                                     onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                                     oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.cod']}" for="cod"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="cod" value="#{ccenter.selected.cod}" size="10" maxlength="10"
+                            readonly="#{not empty ccenter.selected.mod_timp}" validatorMessage="#{uimess['col.cod']}: #{uimess['valid.1to10capitordigit']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="1" maximum="10"/>
+                    <f:validateRegex pattern="[A-Z_0-9]+"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.nume']}" for="nume"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="nume" value="#{ccenter.selected.nume}" size="30" maxlength="50"
+                            validatorMessage="#{uimess['col.nume']}: #{uimess['valid.1to50chars']}">
+                    <f:validateRequired/>
+                    <f:validateLength minimum="1" maximum="50"/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.blocat']}" for="blocat"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="blocat" value="#{ccenter.selected.blocat}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column colspan="2">
+                <p:outputLabel value="#{uimess['col.superior']}" for="super"/>
+            </p:column>
+        </p:row>
+        <p:row>
+            <p:column colspan="2">
+                <p:tree id='super' style="width:auto; max-height: 300px; overflow-y: auto;" value='#{ccenter.hier}' required="true"
+                        var='item' selectionMode="single" selection="#{ccenter.superior}"
+                        requiredMessage="#{uimess['col.superior']}: #{uimess['mess.required']}">
+                    <p:treeNode>
+                        <h:outputText value="#{item.cod} #{item.nume}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:column>
+        </p:row>        
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

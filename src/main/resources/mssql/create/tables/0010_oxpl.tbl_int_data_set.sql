@@ -1,0 +1,20 @@
+create table oxpl.tbl_int_data_set(
+    id int identity(1,1) not null,
+    nume nvarchar(30) not null,
+    vers char(3) not null,
+    an smallint not null,
+    impl_compare int,
+    actual_set int,
+    blocat bit not null constraint tbl_int_data_set_df1 default 1,
+    incheiat bit not null constraint tbl_int_data_set_df2 default 0,
+    raportare bit not null constraint tbl_int_data_set_df3 default 0,
+    mod_de varchar(20) not null,
+    mod_timp datetime not null constraint tbl_int_data_set_df4 default current_timestamp,
+    constraint tbl_int_data_set_pk primary key (id),
+    constraint tbl_int_data_set_uq1 unique (nume),
+    constraint tbl_int_data_set_fk1 foreign key (vers) references oxpl.tbl_int_plan_vers(cod),
+    constraint tbl_int_data_set_fk2 foreign key (impl_compare) references oxpl.tbl_int_data_set(id),
+    constraint tbl_int_data_set_fk3 foreign key (actual_set) references oxpl.tbl_int_data_set(id),
+    constraint tbl_int_data_set_ck1 check (id != impl_compare),
+    constraint tbl_int_data_set_ck2 check (an between 1900 and 9999)
+);

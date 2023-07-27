@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <style type="text/css">
+        #fdlg\:panel p{
+            margin-bottom: 0;
+        }
+        #fdlg\:panel ul{
+            margin: 0;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:panel id="panel">
+        <p>Sorting records by multiple columns:</p>
+        <ul>
+            <li>hold down <b>Ctrl</b> key and click on multiple columns</li>
+            <li>for reverting to sorting on a single column, click on the desired one without holding down <b>Ctrl</b> key</li>
+        </ul>
+        
+        <p>Table filtering:</p>
+        <ul>
+            <li>for applying the filters hit <b>Enter</b> key</li>
+        </ul>
+        
+        <p>Symbols used for table filtering:</p>
+        <p:panelGrid id="filter" style="width: auto;">
+            <f:facet name='header'>
+                <p:row>
+                    <p:column>Symbol</p:column>
+                    <p:column>Description</p:column>
+                    <p:column>Example</p:column>
+                </p:row>
+            </f:facet>
+            
+            <p:row>
+                <p:column>%</p:column>
+                <p:column>
+                    Percentage character:
+                    <ul><li>finds any text with any length including zero length text</li></ul>
+                </p:column>
+                <p:column>
+                    <ul>
+                        <li><b>%auto%</b> - finds any text that contains "auto"</li>
+                        <li><b>auto%</b> - finds any text that starts with "auto"</li>
+                        <li><b>%bus</b> - finds any text that ends with "auto"</li>
+                    </ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>_</p:column>
+                <p:column>
+                    Underscore character:
+                    <ul><li>replaces one character</li></ul>
+                </p:column>
+                <p:column>
+                    <ul>
+                        <li><b>_ontrolling</b> - finds any text that has a length of 11 characters and ends with "ontrolling"</li>
+                    </ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>[ ]</p:column>
+                <p:column>
+                    Characters between square brackets:
+                    <ul><li>finds any character that matched the interval or list of specified characters</li></ul>
+                </p:column>
+                <p:column>
+                    <ul>
+                        <li><b>[a-m]test</b> - finds any text with a length of 5, starts with a character included in the "a-m" interval and ends with "test"</li>
+                        <li><b>[abc]test</b> - finds any text with a length of 5, starts with a character from "abc" list and ends with "test"</li>
+                        <li><b>[a-cms]test</b> - combo between interval and list</li>
+                    </ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>[^]</p:column>
+                <p:column>
+                    Exclusion characters:
+                    <ul><li>finds any character that is not included in the specific interval or list</li></ul>
+                </p:column>
+                <p:column>
+                    <ul>
+                        <li><b>[^a-m]test</b> - finds any text with a length of 5, does not start with a character included in the "a-m" interval and ends with "test"</li>
+                        <li><b>[^abc]test</b> - finds any text with a length of 5, does not start with a character from "abc" list and ends with "test"</li>
+                        <li><b>[^a-cms]test</b> - combo between interval and list</li>
+                    </ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>[]%</p:column>
+                <p:column>
+                    Null values, <b>does not exclude texts with zero length</b> (in Excel the zero length text is represented by a pair of double quotes with nothing in between: "").
+                </p:column>
+                <p:column>
+                    <ul><li>this character sequence is specific to this app (added programmatic)</li></ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column>[^]%</p:column>
+                <p:column>Non null values.</p:column>
+                <p:column>
+                    <ul><li>all texts, including zero length text</li></ul>
+                </p:column>
+            </p:row>
+
+            <p:row>
+                <p:column></p:column>
+                <p:column>Combos:</p:column>
+                <p:column>
+                    <ul><li>
+                        <b>de[^a]%</b> - finds any text that starts with "de", the following character is not "a" and end with any number of characters (or none)
+                    </li></ul>
+                </p:column>
+            </p:row>
+        </p:panelGrid>
+        
+        <p>Filtering date fields:</p>
+        <ul>
+            <li>the format for filtering this type of field is <b>YYYY-MM-DD HH:mm:ss</b> (eg.: <u style="margin: 10px;">2019-01-05 13:12:10</u>, <u style="margin: 10px;">2019-01-05%</u>, <u style="margin: 10px;">%-01-05 13:12:%</u>).</li>
+        </ul>
+    </p:panel>
+    
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>

@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <style>
+        #fdlg .ui-panelgrid tr,
+        #fdlg .ui-panelgrid td{
+            border: none;
+        }
+        
+        #fdlg .ui-tabs-nav{
+            border-bottom: 1px solid #bebebe;
+            
+        }
+        
+        #fdlg .ui-tabs-panels{
+            border-left: none !important;
+            border-right: none !important;
+            border-bottom: none !important;
+        }
+
+        #fdlg .ui-tabs-panel{
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        #fdlg .ui-tabs-selected{
+            font-weight: bold;
+        }
+        
+        #fdlg\:taburi\:sheet .ui-datatable-header{
+            background: none;
+            border: none;
+            text-align: left;
+            color: black;
+        }
+        
+        #fdlg\:taburi\:sheet .wtHolder{
+            width: auto !important;
+        }
+        
+        #fdlg\:taburi\:sheet .handsontableInputHolder{
+            z-index: auto !important;
+        }
+        
+        #fdlg\:taburi\:sheet td.alignRight{
+            text-align: right;
+        }
+        
+        #fdlg\:taburi\:sheet td:not(.htDimmed){
+            background-color: #e6f2ff;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['keys.s01.nosel']}" rendered="#{empty ks01.selected}"/>
+    <p:staticMessage severity='warn' detail="#{ks01.initError}" rendered="#{not empty ks01.initError}"/>
+    <c:if test="#{not empty ks01.selected and empty ks01.initError}">
+        <p:panelGrid id='panel-top'>
+            <p:row>
+                <p:column>
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save"
+                        action="#{ks01.save()}" update="panel-top"                             
+                        onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                        oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>            
+            <p:row>
+                <p:column>
+                    <p:messages closable="true"/>
+                </p:column>
+            </p:row>
+        </p:panelGrid>
+
+        <p:tabView id="taburi">
+            <p:tab title="#{uimess['col.def']}" id='definitie'>
+                <p:panelGrid id='panel-definitie'>
+                    <p:row rendered="#{not empty ks01.selected.mod_timp}">
+                        <p:column>
+                            <p:outputLabel value="Id"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{ks01.selected.id}"/>
+                        </p:column>
+                    </p:row>
+                    
+                    <p:row rendered="#{not empty ks01.selected.mod_timp}">
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.ccenter']}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{ks01.selected.cost_center} #{ks01.selected.cost_center_nume}"/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.nume']}" for='nume'/>
+                        </p:column>
+                        <p:column>
+                            <p:inputText id='nume' value="#{ks01.selected.nume}" size='30' maxlength="50"
+                                         validatorMessage="#{uimess['col.def']} -> #{uimess['col.nume']}: #{uimess['mess.required']}">
+                                <f:validateRequired/>
+                            </p:inputText>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel value="#{uimess['col.descr']}" for='descr'/>
+                        </p:column>
+                        <p:column>
+                            <p:inputTextarea id='descr' value="#{ks01.selected.descr}" rows='10' cols='50' maxlength="4000" autoResize="false"
+                                             validatorMessage="#{uimess['col.def']} -> #{uimess['col.descr']}: #{uimess['mess.required']}">
+                                <f:validateRequired/>                
+                            </p:inputTextarea>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+             </p:tab>
+
+            <p:tab title="#{uimess['col.valori']}" id='valori'>
+                <pe:sheet id="sheet" value="#{ks01.rows}" var="row" rowKey="#{row.cod}" showRowHeaders="false">
+                    <p:ajax event="change" update="sheet" partialSubmit="true" process="@this"/>
+                    
+                    <f:facet name="header">
+                        <c:forEach items="#{ks01.dataset_ani}" var="an">
+                            <h:outputText value="#{an}: " style="font-weight: bold;"/>
+                            <h:outputText value="#{ks01.getRowSumByAn(an)}" style="font-weight: normal;">
+                                <f:convertNumber maxFractionDigits="2" pattern="#,##0.00"/>
+                            </h:outputText>
+                            <p:spacer width="10"/>
+                        </c:forEach>
+                    </f:facet>
+                    
+                    <pe:sheetcolumn headerText="#{uimess['col.bline']}" readOnly="true" value="#{row.cod} #{row.segment} #{row.nume}"/>
+                    <c:forEach items="#{ks01.dataset_ani}" var="an">
+                        <pe:sheetcolumn headerText="#{an}" value="#{row.getCellByAn(an).valoare}" readOnly="false" styleClass="alignRight">
+                            <f:converter converterId="sheetCellFormulaConverter"/>
+                        </pe:sheetcolumn>
+                    </c:forEach>
+                    <c:forEach items="#{ks01.dataset_ani}" var="an">
+                        <pe:sheetcolumn headerText="#{an} (%)" value="#{ks01.getRowPercentByAn(row.getCellByAn(an).valoare, an)}" readOnly="true" styleClass="alignRight">
+                            <f:convertNumber maxFractionDigits="2" pattern="#%"/>
+                        </pe:sheetcolumn>
+                    </c:forEach>
+                </pe:sheet>
+                <h:outputText style="font-style: italic; color: #666666;" value="#{uimess['mess.sheet.formula.info']}"/>
+            </p:tab>
+        </p:tabView>
+    </c:if>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

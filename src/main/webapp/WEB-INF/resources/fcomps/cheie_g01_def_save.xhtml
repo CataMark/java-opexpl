@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content:not(:first-child){
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{uimess['keys.s01.nosel']}" rendered="#{empty kg01h.selected}"/>
+    <p:staticMessage severity='warn' detail="#{kg01h.initError}" rendered="#{not empty kg01h.initError}"/>
+    <p:panelGrid id='panel' rendered="#{not empty kg01h.selected and empty kg01h.initError}">
+        <f:facet name="header">
+            <p:row rendered="#{not empty kg01h.selected.mod_timp}">
+                <p:column colspan="2" style="text-align: left;">
+                    <h:outputText value="#{uimess['keys.gen.save.info']}"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+
+        <p:row rendered="#{not empty kg01h.selected.mod_timp}">
+            <p:column>
+                <p:outputLabel value="Id"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{kg01h.selected.id}"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.nume']}" for='nume'/>
+            </p:column>
+            <p:column>
+                <p:inputText id='nume' value="#{kg01h.selected.nume}" size='30' maxlength="50" 
+                             validatorMessage="#{uimess['col.nume']}: #{uimess['mess.required']}">
+                    <f:validateRequired/>
+                </p:inputText>
+            </p:column>
+        </p:row>
+        <p:row>
+            <p:column colspan="2">
+                <p:outputLabel value="#{uimess['col.descr']}" for='descr'/>
+            </p:column>
+        </p:row>
+        <p:row>
+            <p:column colspan="2">
+                <p:inputTextarea id='descr' value="#{kg01h.selected.descr}" rows='10' cols='50' autoResize="false" maxlength="4000"
+                                 validatorMessage="#{uimess['col.descr']}: #{uimess['mess.required']}">
+                    <f:validateRequired/>                
+                </p:inputTextarea>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['col.blocat']}" for="blocat"/>
+            </p:column>
+            <p:column>
+                <p:selectBooleanCheckbox id="blocat" value="#{kg01h.selected.blocat}"/>
+            </p:column>
+        </p:row>
+
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id='save' widgetVar="dialog-save" value="#{uimess['mess.save']}" icon="fa fa-save" action="#{kg01h.save()}" update="panel"                             
+                             onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-save').disable();"
+                             oncomplete="PF('dialog-save').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
+

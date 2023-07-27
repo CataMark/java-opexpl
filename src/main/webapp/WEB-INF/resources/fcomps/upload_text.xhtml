@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    
+    <style type='text/css'>
+        #fdlg\:panel .ui-widget-content{
+            border-bottom: none;
+        }
+        #fdlg\:panel .ui-widget-content{
+            border-top: none;
+        }        
+        #fdlg\:panel .ui-panelgrid-cell{
+            border: none;
+        }
+    </style>
+    
+    <div style="width: 100%; height: 0.5rem;">
+        <p:progressBar id="progress" mode="indeterminate" displayOnly="true"
+                style="height: 100%; border-radius: 0; border: none; background: none;"/>
+    </div>
+    
+    <p:staticMessage severity='warn' detail="#{dbload.errorTextLoadInit}" rendered="#{not empty dbload.errorTextLoadInit}"/>
+    <p:panelGrid id="panel" rendered="#{empty dbload.errorTextLoadInit}">
+        <f:facet name="header">
+            <p:row>
+                <p:column colspan="2" style="text-align: left; font-weight: normal;">
+                    <h:outputText value="#{uimess['upload.head.3']}"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+        
+        <p:row>
+            <p:column colspan="2">
+                <p:messages closable="true"/>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['upload.field.delimitator']}" for="delimitator"/>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu id="delimitator" value="#{dbload.delimitator}" requiredMessage="#{uimess['upload.field.delimitator']}: #{uimess['mess.required']}">
+                    <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                    <f:selectItem itemLabel=", - #{uimess['upload.delim.comma']}" itemValue=","/>
+                    <f:selectItem itemLabel="; - #{uimess['upload.delim.semicolon']}" itemValue=";"/>
+                    <f:selectItem itemLabel="\t - tab" itemValue="\t"/>
+                    <f:selectItem itemLabel="&#124; - #{uimess['upload.delim.pipe']}" itemValue="\&#124;"/>
+                    <f:validateRequired/>
+                </p:selectOneMenu>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['upload.field.quotes']}" for="quotes"/>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu id="quotes" value="#{dbload.quote}">
+                    <f:selectItem itemLabel="#{uimess['mess.select']}" itemValue=""/>
+                    <f:selectItem itemLabel="&quot; - #{uimess['upload.quotes.ghilimele']}" itemValue="\&quot;"/>
+                    <f:selectItem itemLabel="&apos; - #{uimess['upload.quotes.apostrof']}" itemValue="\&apos;"/>
+                    <f:selectItem itemLabel="\&#92; - #{uimess['upload.quotes.backslash']}" itemValue="\&#92;"/>
+                    <f:selectItem itemLabel="&#47; - #{uimess['upload.quotes.slash']}" itemValue="\&#47;"/>
+                    <f:selectItem itemLabel="&#124; - #{uimess['upload.quotes.pipe']}" itemValue="\&#124;"/>
+                </p:selectOneMenu>
+            </p:column>
+        </p:row>
+        
+        <p:row>
+            <p:column>
+                <p:outputLabel value="#{uimess['upload.field.text']}" for="text"/>
+            </p:column>
+            <p:column>
+                <p:inputTextarea id="text" value="#{dbload.textLoad}" rows="10" cols="30" autoResize="false"
+                                 requiredMessage="#{uimess['upload.field.text']}: #{uimess['mess.required']}">
+                    <f:validateRequired/>
+                </p:inputTextarea>
+            </p:column>
+        </p:row>
+        
+        <f:facet name="footer">
+            <p:row>
+                <p:column colspan="2">
+                    <p:commandButton id="upload" widgetVar="dialog-upload" value="#{uimess['upload.btn.load']}" icon="fa fa-upload" action="#{dbload.loadText()}" update="panel"
+                             onstart="jQuery('#fdlg\\:progress').show(); PF('dialog-upload').disable();"
+                             oncomplete="PF('dialog-upload').enable(); jQuery('#fdlg\\:progress').fadeOut(800);"/>
+                </p:column>
+            </p:row>
+        </f:facet>
+    </p:panelGrid>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        jQuery(document).ready(function() {
+            jQuery('#fdlg\\:progress').fadeOut(800);
+        });
+        /* ]]> */
+    </script>
+</ui:composition>
