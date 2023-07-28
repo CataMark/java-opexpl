@@ -13,6 +13,7 @@
 - .xlsx/ .csv/ .txt files upload/ download
 - MS SQL server backend
 - Bilingual UX
+- Responsive UX
 
 ## Dependencies
 - Glassfish Application Server
@@ -23,3 +24,20 @@
 - Weld CDI
 - Docker
 - HandsOnTable (for data entry)
+
+# Screenshots
+
+### Cloud resource overview
+![azure resources](./screenshots/azure-resources.png)
+
+### Select planning object prompt
+![select planning object](./screenshots/opexpl_1.png)
+
+### Planned values summary
+![planned values summary](./screenshots/opexpl_2.png)
+
+### Plan new record using formula for values
+![plan new record with value formula](./screenshots/opexpl_3.png)
+
+### Plan new record, drag value for all periods
+![plan new record value drag](./screenshots/opexpl_4.png)
